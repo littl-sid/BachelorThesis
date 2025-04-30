@@ -11,6 +11,7 @@ def main():
     y = np.random.normal(size=len(x))
     plt.plot(x, y)
     plt.show()
+    # some change
 
 
 if __name__ == "__main__":
