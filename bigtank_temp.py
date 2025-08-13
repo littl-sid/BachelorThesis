@@ -20,17 +20,17 @@ dates = []
 temps = []
 
 for i in dataset:
-    date = i[0]          #datetime.strptime(i[0], "%d-%m-%y")
+    date = i[0]  # datetime.strptime(i[0], "%d-%m-%y")
     dates.append(date)
 
     temp = i[1]
     temps.append(temp)
-    #plt.scatter(date, temp)
+    plt.scatter(date, temp)
 
-plt.plot(dates, temps)
+# plt.plot(dates, temps)    # normaler Plot
 
 plt.xlabel("Mess-Zeitpunkte")
 plt.ylabel("Temperatur [°C]")
-plt.xticks(rotation=45) 
+plt.xticks(rotation=45)
 plt.tight_layout()
 plt.show()

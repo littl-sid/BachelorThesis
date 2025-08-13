@@ -12,7 +12,7 @@ while True:
     date_now = datetime.now().date()
 
     if time_now in start_times:
-        # Dateiname
+        # Dateiname - entsprechend Datum & Zeit
         if time_now == "00:00":
             file_name = f"{date_now}_1.mp4"
         elif time_now == "12:00":
@@ -23,6 +23,7 @@ while True:
         # Kamerastart über Terminal
         command = f"./minimal_pylon -f 10 -q 15 -n 70000 -c 2 -w 2200 -h 1600 -x 500 -y 500 -e 30000 -g1 10.0 -g2 8.8 -o {file_name}"
 
+        # Ausgaben in Terminal & Pause der While-Schleife
         try:
             print(f"Starte Aufnahme: {file_name}")
             subprocess.run(command, shell=True)
