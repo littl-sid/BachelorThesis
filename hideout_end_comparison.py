@@ -3,66 +3,66 @@ from IPython import embed
 import numpy as np
 
 # Fish Lists
-all_fish = [  # Trial_1, ..., Trial_12 - Frequency, Size hideout at the end
+all_fish = [  # Frequency, Size, hideout at the end, Trial number
     [  # T1
-        [900, 19, "große Röhre"],
-        [770, 16, "kleine Röhre"],
-        [870, 18, "mittlere Röhre"],
-        [835, 14, "zwischen Futter und Röhre"],
+        [900, 19, "große Röhre", 1],
+        [770, 16, "kleine Röhre", 1],
+        [870, 18, "mittlere Röhre", 1],
+        [835, 14, "zwischen Futter und Röhre", 1],
     ],
     [  # T3
-        [725, 17, "Wandspalt"],
-        [875, 14, "E-Reihe"],
-        [675, 16, "mittlere Röhre"],
-        [910, 18, "große Röhre"],
+        [725, 17, "Wandspalt", 3],
+        [875, 14, "E-Reihe", 3],
+        [675, 16, "mittlere Röhre", 3],
+        [910, 18, "große Röhre", 3],
     ],
     [  # T4
-        [630, 15, "E-Reihe"],
-        [780, 14, "große Röhre"],
-        [644, 18, "E-Reihe"],
-        [805, 19, "halb in Rampe"],
+        [630, 15, "E-Reihe", 4],
+        [780, 14, "große Röhre", 4],
+        [644, 18, "E-Reihe", 4],
+        [805, 19, "halb in Rampe", 4],
     ],
     [  # T5
-        [809, 15, "kleine Röhre"],
-        [808, 19, "mittlere Röhre"],
-        [720, 17, "Wandspalt"],
-        [840, 19, "große Röhre"],
+        [809, 15, "kleine Röhre", 5],
+        [808, 19, "mittlere Röhre", 5],
+        [720, 17, "Wandspalt", 5],
+        [840, 19, "große Röhre", 5],
     ],
     [  # T6
-        [684, 14, "Wandspalt"],
-        [660, 15, "mittlere Röhre"],
-        [861, 18, "große Röhre"],
-        [826, 15, "E-Kabel"],
+        [684, 14, "Wandspalt", 6],
+        [660, 15, "mittlere Röhre", 6],
+        [861, 18, "große Röhre", 6],
+        [826, 15, "E-Kabel", 6],
     ],
     [  # T7
-        [876, 18.5, "kleine Röhre"],
-        [824, 20, "große Röhre"],
-        [793, 15, "frei im Wasser"],
-        [797, 18, "mittlere Röhre"],
+        [876, 18.5, "kleine Röhre", 7],
+        [824, 20, "große Röhre", 7],
+        [793, 15, "frei im Wasser", 7],
+        [797, 18, "mittlere Röhre", 7],
     ],
     [  # T8
-        [806, 16, "große Röhre"],
-        [840, 15, "unter Rampe"],
-        [810, 16.5, "unter Rampe"],
-        [825, 20, "unter Rampe"],
+        [806, 16, "große Röhre", 8],
+        [840, 15, "unter Rampe", 8],
+        [810, 16.5, "unter Rampe", 8],
+        [825, 20, "unter Rampe", 8],
     ],
     [  # T10
-        [720, 17, "Wandspalt"],
-        [730, 15, "E-Kabel"],
-        [840, 20.5, "große Röhre"],
-        [870, 19, "mittlere Röhre"],
+        [720, 17, "Wandspalt", 10],
+        [730, 15, "E-Kabel", 10],
+        [840, 20.5, "große Röhre", 10],
+        [870, 19, "mittlere Röhre", 10],
     ],
     [  # T11
-        [780, 15.5, "Wandspalt"],
-        [770, 17, "große Röhre"],
-        [614, 14, "mittlere Röhre"],
-        [790, 20, "mittlere Röhre"],
+        [780, 15.5, "Wandspalt", 11],
+        [770, 17, "große Röhre", 11],
+        [614, 14, "mittlere Röhre", 11],
+        [790, 20, "mittlere Röhre", 11],
     ],
     [  # T12
-        [724, 13, "mittlere Röhre"],
-        [837, 18, "große Röhre"],
-        [650, 14, "Wanspalt"],
-        [712, 13, "Wandspalt"],
+        [724, 13, "mittlere Röhre", 12],
+        [837, 18, "große Röhre", 12],
+        [650, 14, "Wanspalt", 12],
+        [712, 13, "Wandspalt", 12],
     ],
 ]
 
@@ -76,8 +76,9 @@ colors = plt.cm.tab10.colors  # 10 Farben aus matplotlib Tab10
 
 def plot_by_attribute(attribute_index, title):
     plt.figure(figsize=(8, 5))
-    for trial_idx, trial in enumerate(all_fish, start=1):
-        color = colors[(trial_idx - 1) % len(colors)]  # Farbe für Trial
+    for trial in all_fish:
+        trial_number = trial[0][-1]  # echte Trialnummer
+        color = colors[(trial_number - 1) % len(colors)]  # Farbe nach Trialnummer
 
         # Nach gewähltem Attribut sortieren (0=Frequenz, 1=Größe)
         sorted_fishes = sorted(trial, key=lambda x: x[attribute_index], reverse=True)
@@ -100,7 +101,7 @@ def plot_by_attribute(attribute_index, title):
 
         # Legende mit Steigung
         slope = z[0]
-        plt.scatter([], [], color=color, label=f"Trial {trial_idx}: m={slope:.2f}")
+        plt.scatter([], [], color=color, label=f"Trial {trial_number}: m={slope:.2f}")
 
     # Achsen und Labels
     plt.xticks([1, 2, 3, 4], ["1", "2", "3", "4"])
@@ -118,8 +119,9 @@ def plot_by_attribute(attribute_index, title):
 
 def plot_frequency_vs_size():
     plt.figure(figsize=(8, 5))
-    for trial_idx, trial in enumerate(all_fish, start=1):
-        color = colors[(trial_idx - 1) % len(colors)]
+    for trial in all_fish:
+        trial_number = trial[0][-1]  # echte Trialnummer
+        color = colors[(trial_number - 1) % len(colors)]  # Farbe nach Trialnummer
 
         # Ränge für Frequenz
         freq_sorted = sorted(trial, key=lambda x: x[0], reverse=True)
@@ -141,13 +143,18 @@ def plot_frequency_vs_size():
             x_vals.append(freq_ranks[key])
             y_vals.append(size_ranks[key])
 
+        # Scatterpunkte
         plt.scatter(x_vals, y_vals, s=50, edgecolor="black", color=color)
+
+        # Trendlinie
         z = np.polyfit(x_vals, y_vals, 1)
         p = np.poly1d(z)
         x_line = np.linspace(min(x_vals), max(x_vals), 100)
         plt.plot(x_line, p(x_line), linestyle="-", alpha=0.8, color=color)
+
+        # Legende mit Steigung
         slope = z[0]
-        plt.scatter([], [], color=color, label=f"Trial {trial_idx}: m={slope:.2f}")
+        plt.scatter([], [], color=color, label=f"Trial {trial_number}: m={slope:.2f}")
 
     plt.xlabel("Rang nach Frequenz (1 = höchster Wert)")
     plt.ylabel("Rang nach Größe (1 = höchster Wert)")
