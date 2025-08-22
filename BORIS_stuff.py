@@ -1,7 +1,8 @@
-import matplotlib.pyplot as plt
 from IPython import embed
-import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
 import glob
+import numpy as np
 from functions import sort_files
 
 
