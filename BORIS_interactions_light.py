@@ -3,22 +3,37 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import glob
 import numpy as np
-from functions import sort_files, count_interactions
+from functions import get_periods, get_interactions
 
 
 def main():
     # alle passenden CSV-Dateien suchen
     all_files = glob.glob("BORIS_events/Trial*_V*_events.csv")
 
-    # Dateien nach Trial und Video sortieren
-    # sorted_files = sort_files(all_files)
-
     all_interactions_light = []
     all_interactions_dark = []
     # Durch Trials gehen
     for f in all_files:
         file = pd.read_csv(f)
-        interactions_light, interactions_dark = count_interactions(file)
+        light_period = get_periods(file, "Licht")
+        interactions = get_interactions(file)
+
+        interactions_light = 0
+        interactions_dark = 0
+        # sort contacts if they are during light or not
+        for _, row in interactions.iterrows():
+            interaction_time = row["Time"]
+
+            # check if contact is during light
+            in_light = any(
+                start <= interaction_time <= end for (start, end) in light_period
+            )
+
+            if in_light:
+                interactions_light += 1
+            else:
+                interactions_dark += 1
+
         all_interactions_light.append(interactions_light)
         all_interactions_dark.append(interactions_dark)
 

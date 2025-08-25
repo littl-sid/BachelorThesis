@@ -38,7 +38,6 @@ def main():
                 start <= interaction_time <= end for (start, end) in plattform_B_period
             )
 
-            # check if contact is during light
             if in_A and in_B:
                 interactions_not_clear += 1
             elif in_A:

@@ -57,23 +57,7 @@ def sort_files(files):
     return T3, T4, T5, T6, T7, T8, T10, T11, T12
 
 
-def count_interactions(file):
-    # ----- contacts in light perios -----
-    # get the light phase of the file
-    light_phase = []
-    start_time = None
-
-    for _, row in file.iterrows():
-        if row["Behavior"] == "Licht" and row["Behavior type"] == "START":
-            start_time = row["Time"]
-        elif (
-            row["Behavior"] == "Licht"
-            and row["Behavior type"] == "STOP"
-            and start_time is not None
-        ):
-            light_phase.append((start_time, row["Time"]))
-            start_time = None
-
+def get_interactions(file):
     # get the interaction events of the file
     interactions_def = [
         "contact",
@@ -88,19 +72,21 @@ def count_interactions(file):
     interactions = file[
         file["Behavior"].str.contains("|".join(interactions_def), case=False, na=False)
     ]
+    return interactions
 
-    # sort contacts if they are during light or not
-    interactions_light = 0
-    interactions_dark = 0
 
-    for _, row in interactions.iterrows():
-        interaction_time = row["Time"]
-
-        # check if contact is during light
-        in_light = any(start <= interaction_time <= end for (start, end) in light_phase)
-
-        if in_light:
-            interactions_light += 1
-        else:
-            interactions_dark += 1
-    return interactions_light, interactions_dark
+def get_periods(file, behaviors):
+    # get the perios in which behaviors occur
+    periods = []
+    start_time = None
+    for _, row in file.iterrows():
+        if row["Behavior"] in behaviors and row["Behavior type"].upper() == "START":
+            start_time = row["Time"]
+        elif (
+            row["Behavior"] in behaviors
+            and row["Behavior type"].upper() == "STOP"
+            and start_time is not None
+        ):
+            periods.append((start_time, row["Time"]))
+            start_time = None
+    return periods
