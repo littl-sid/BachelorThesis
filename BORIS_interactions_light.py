@@ -18,6 +18,8 @@ def main():
         light_period = get_periods(file, "Licht")
         interactions = get_interactions(file)
 
+        embed()
+
         interactions_light = 0
         interactions_dark = 0
         # sort contacts if they are during light or not
