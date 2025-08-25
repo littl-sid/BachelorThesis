@@ -75,6 +75,8 @@ def main():
     plt.title("Verschiedene Interaktionen")
     plt.xticks(rotation=30, ha="right")  # bessere Lesbarkeit
     plt.tight_layout()
+
+    plt.savefig("fig_count_indivual_interactions_overall.png")
     plt.show()
 
 

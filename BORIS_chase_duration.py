@@ -36,6 +36,8 @@ def main():
     plt.ylabel("Dauer der Chases (s)")
     plt.title("Chase Dauer")
     plt.grid(axis="y", linestyle="--", alpha=0.7)
+
+    plt.savefig("fig_chase_duration.png")
     plt.show()
 
 

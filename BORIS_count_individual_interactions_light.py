@@ -185,6 +185,8 @@ def main():
     ax.legend()
 
     plt.tight_layout()
+
+    plt.savefig("fig_count_indivudal_interactions_lightphases.png")
     plt.show()
 
 

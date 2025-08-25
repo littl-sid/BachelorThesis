@@ -8,7 +8,7 @@ from functions import get_periods, get_interactions
 
 def main():
     # get all CSV files
-    all_files = glob.glob("BORIS_events/Trial*_V*_events.csv")
+    all_files = glob.glob("BORIS_events/Trial4_V*_events.csv")
 
     all_interactions_A = []
     all_interactions_B = []
@@ -44,8 +44,8 @@ def main():
                 interactions_A += 1
             elif in_B:
                 interactions_B += 1
-            else:
-                interactions_not_clear += 1
+            # else:
+            # interactions_not_clear += 1
 
         all_interactions_A.append(interactions_A)
         all_interactions_B.append(interactions_B)
@@ -69,6 +69,8 @@ def main():
     )
     plt.ylabel("# Interaktionen")
     plt.title("Interaktionen Plattformen")
+
+    plt.savefig("fig_plattform_interactions.png")
     plt.show()
 
 

@@ -90,3 +90,15 @@ def get_periods(file, behaviors):
             periods.append((start_time, row["Time"]))
             start_time = None
     return periods
+
+
+def get_trial_and_video(file):
+    # --- get trial- & video number from filename with pattern such as: 'BORIS_events/Trial5_V3_events.csv'
+
+    trial_match = re.search(r"Trial(\d+)", file)
+    video_match = re.search(r"V(\d+)", file)
+
+    trial_number = int(trial_match.group(1)) if trial_match else None
+    video_number = int(video_match.group(1)) if video_match else None
+
+    return trial_number, video_number

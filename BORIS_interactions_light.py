@@ -18,8 +18,6 @@ def main():
         light_period = get_periods(file, "Licht")
         interactions = get_interactions(file)
 
-        embed()
-
         interactions_light = 0
         interactions_dark = 0
         # sort contacts if they are during light or not
@@ -55,6 +53,8 @@ def main():
     )
     plt.ylabel("# Interaktionen")
     plt.title("Interaktionen Tag vs. Nacht")
+
+    plt.savefig("fig_interactions_lightphases.png")
     plt.show()
 
 
