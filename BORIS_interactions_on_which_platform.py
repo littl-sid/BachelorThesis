@@ -45,7 +45,7 @@ def get_interactions_on_platforms(dataset, name):
             elif in_B:
                 interactions_B += 1
             else:
-                error += 1
+                interactions_not_clear += 1
 
         all_interactions_A.append(interactions_A)
         all_interactions_B.append(interactions_B)
