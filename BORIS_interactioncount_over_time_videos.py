@@ -99,7 +99,7 @@ def main():
     plt.ylabel("# Interaktionen")
     plt.xticks(rotation=30, ha="right")
     plt.tight_layout()
-    plt.savefig("fig_interactioncount_over_time_videos.png")
+    plt.savefig("fig_interactioncount_over_time_videos.pdf")
     plt.show()
 
 

@@ -201,7 +201,7 @@ def main():
     plt.xticks(rotation=30, ha="right")
     plt.legend(title="", bbox_to_anchor=(1, 1), loc="upper right")
     plt.tight_layout()
-    plt.savefig("fig_individual_interactions_lightphases.png")
+    plt.savefig("fig_individual_interactions_lightphases.pdf")
     plt.show()
 
 

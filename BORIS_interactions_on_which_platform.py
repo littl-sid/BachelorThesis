@@ -116,7 +116,7 @@ def get_interactions_on_platforms(dataset, name):
     ax.set_title("Interaktionen Plattformen")
 
     plt.tight_layout()
-    plt.savefig(f"fig_plattform_interactions_{name}.png")
+    plt.savefig(f"fig_plattform_interactions_{name}.pdf")
     plt.show()
 
 

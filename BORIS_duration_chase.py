@@ -32,7 +32,7 @@ def main():
         chase_durations.append(duration)
 
     # ----- Plot -----
-    fig, ax = plt.subplots(figsize=(6, 6))
+    fig, ax = plt.subplots(figsize=(10, 6))
     ax.boxplot(
         chase_durations,
         patch_artist=True,
@@ -55,7 +55,7 @@ def main():
     )
 
     plt.tight_layout()
-    plt.savefig("fig_duration_chase.png")
+    plt.savefig("fig_duration_chase.pdf")
     plt.show()
 
 

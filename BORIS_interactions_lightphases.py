@@ -102,7 +102,7 @@ def main():
     ax.set_ylabel("# Interaktionen")
     # ax.set_title("Interaktionen Tag vs. Nacht")
     plt.tight_layout()
-    plt.savefig("fig_interactions_lightphases.png")
+    plt.savefig("fig_interactions_lightphases.pdf")
     plt.show()
 
 

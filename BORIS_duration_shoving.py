@@ -34,7 +34,7 @@ def main():
         durations.append(duration)
 
     # ----- Plot -----
-    fig, ax = plt.subplots(figsize=(6, 6))
+    fig, ax = plt.subplots(figsize=(10, 6))
     ax.boxplot(
         durations,
         patch_artist=True,
@@ -57,7 +57,7 @@ def main():
     )
 
     plt.tight_layout()
-    plt.savefig("fig_duration_shoving.png")
+    plt.savefig("fig_duration_shoving.pdf")
     plt.show()
 
 

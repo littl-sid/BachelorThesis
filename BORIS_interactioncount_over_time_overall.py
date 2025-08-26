@@ -25,6 +25,8 @@ def main():
             interaction_count.append([len(interactions), video_number])
 
     # ----- Plot -----
+    plt.figure(figsize=(10, 6))
+
     x = np.array([i[1] for i in interaction_count])
     y = np.array([i[0] for i in interaction_count])
 
@@ -49,7 +51,7 @@ def main():
     # plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
     plt.tight_layout()
 
-    plt.savefig("fig_interactioncount_over_time_overall.png")
+    plt.savefig("fig_interactioncount_over_time_overall.pdf")
     plt.show()
 
 

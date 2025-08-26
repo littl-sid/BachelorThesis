@@ -4,149 +4,51 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import glob
 import numpy as np
-from functions import get_periods, get_interactions, get_color, get_legend
+from functions import get_interactions, sort_files, get_trial_and_video
 
 
 def main():
     # get all CSV files
-    # dataset_1 = []
-    # for d in [
-    #     "BORIS_events/Trial3_V*_events.csv",
-    #     "BORIS_events/Trial5_V*_events.csv",
-    #     "BORIS_events/Trial6_V*_events.csv",
-    # ]:
-    #     dataset_1.extend(glob.glob(d))
+    all_files = glob.glob("BORIS_events/Trial*_V*_events.csv")
 
-    dataset_2 = []
-    for d in [
-        "BORIS_events/Trial7_V*_events.csv",
-        "BORIS_events/Trial8_V*_events.csv",
-        "BORIS_events/Trial10_V*_events.csv",
-        "BORIS_events/Trial11_V*_events.csv",
-        "BORIS_events/Trial12_V*_events.csv",
-    ]:
-        dataset_2.extend(glob.glob(d))
+    # sort files for trial and video number
+    sorted_files = sort_files(all_files)
 
-    all_interactions_A = []
-    all_interactions_B = []
-    all_interactions_not_clear = []
-    # go through files
-    for f in dataset_2:
-        file = pd.read_csv(f)
+    # color palette trials
+    colors = plt.cm.tab10.colors  # 10 Farben aus matplotlib Tab10
 
-        # get periods of Plattform locations for #fish > 2
-        plattform_A_period = get_periods(file, ["2 A", "3 A", "4 A"])
-        plattform_B_period = get_periods(file, ["2 B", "3 B", "4 B"])
+    fig, ax = plt.subplots(figsize=(10, 6))  # nur einmal
 
-        # get all interaction events
-        interactions_def = [
-            "contact",
-            "Tail Whip",
-            "Mouth Aggression",
-            "shoving",
-            "bluff charge",
-            "chasing onset",
-        ]
+    for trial in sorted_files:
+        interaction_count = []
+        for v in trial:
+            trial_number, _ = get_trial_and_video(v)
+            color = colors[(trial_number - 1) % len(colors)]
+            file = pd.read_csv(v)
+            interactions = get_interactions(file)
+            interaction_count.append(len(interactions))
 
-        interactions = file[
-            file["Behavior"].str.contains(
-                "|".join(interactions_def), case=False, na=False
-            )
-        ]
+        x_axis = range(1, len(interaction_count) + 1)
+        ax.scatter(x_axis, interaction_count, color=color)
+        z = np.polyfit(x_axis, interaction_count, 1)
+        p = np.poly1d(z)
+        x_line = np.linspace(min(x_axis), max(x_axis), 100)
+        ax.plot(x_line, p(x_line), linestyle="-", alpha=0.8, color=color)
 
-        interactions_A = 0
-        interactions_B = 0
-        interactions_not_clear = 0
-        # sort contacts for their location
-        for _, row in interactions.iterrows():
-            interaction_time = row["Time"]
+        # für Legende Dummy-Punkt
+        slope = z[0]
+        n = len(interaction_count)
+        ax.scatter(
+            [], [], color=color, label=f"Trial {trial_number}: m={slope:.2f}, n={n}"
+        )
 
-            in_A = any(
-                start <= interaction_time <= end for (start, end) in plattform_A_period
-            )
-            in_B = any(
-                start <= interaction_time <= end for (start, end) in plattform_B_period
-            )
-
-            if in_A and in_B:
-                interactions_not_clear += 1
-            elif in_A:
-                interactions_A += 1
-            elif in_B:
-                interactions_B += 1
-            else:
-                interactions_not_clear += 1
-
-        all_interactions_A.append(interactions_A)
-        all_interactions_B.append(interactions_B)
-        all_interactions_not_clear.append(interactions_not_clear)
-
-    # ----- Plot -----
-    # Farben bestimmen
-    color_A, color_B = get_color(f)
-
-    fig, ax = plt.subplots(figsize=(10, 6))
-
-    # Boxplot zeichnen
-    bp = ax.boxplot(
-        [all_interactions_A, all_interactions_B, all_interactions_not_clear],
-        labels=["A", "B", "X"],
-        patch_artist=True,
-        boxprops=dict(color="black"),
-        medianprops=dict(color="black"),
-        whiskerprops=dict(color="black"),
-        capprops=dict(color="black"),
-        flierprops=dict(marker="o", color="red", alpha=0.5),
-    )
-
-    # Farben einsetzen
-    colors = [color_A, color_B, "gray"]
-    for patch, col in zip(bp["boxes"], colors):
-        patch.set_facecolor(col)
-
-    # Legende
-    handles = get_legend(f)
-    ax.legend(handles=handles, loc="upper right")
-
-    # Stichprobengröße unter jede Box schreiben
-    ns = [
-        len(all_interactions_A),
-        len(all_interactions_B),
-        len(all_interactions_not_clear),
-    ]
-    for i, n in enumerate(ns, start=1):
-        ax.text(i, -0.05 * max(ns), f"n = {n}", ha="center", va="top", fontsize=10)
-
-    # ----- Statistischer Test A vs. B -----
-    # Mann-Whitney-U-Test
-    stat, p = mannwhitneyu(
-        all_interactions_A, all_interactions_B, alternative="two-sided"
-    )
-
-    # oder alternativ: t-Test
-    # stat, p = ttest_ind(all_interactions_A, all_interactions_B, equal_var=False)
-
-    # Signifikanz-Level bestimmen
-    if p < 0.001:
-        sig = "***"
-    elif p < 0.01:
-        sig = "**"
-    elif p < 0.05:
-        sig = "*"
-    else:
-        sig = "ns"
-
-    # Linie und Sternchen über A und B zeichnen
-    max_y = max(max(all_interactions_A), max(all_interactions_B))
-    y, h = max_y * 1.1, max_y * 0.05
-    ax.plot([1, 1, 2, 2], [y, y + h, y + h, y], lw=1.5, color="black")
-    ax.text(1.5, y + h, sig, ha="center", va="bottom", fontsize=12)
-
+    ax.set_xticks([1, 2, 3, 4])
+    ax.set_xticklabels(["1", "2", "3", "4"])
     ax.set_ylabel("# Interaktionen")
-    ax.set_title("Interaktionen Plattformen")
-
+    ax.set_xlabel("Zeit über Videonummer")
+    ax.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
     plt.tight_layout()
-    plt.savefig(f"fig_plattform_interactions_test.png")
+    plt.savefig("fig_interactioncount_over_time_trials.pdf")
     plt.show()
 
 

@@ -121,7 +121,7 @@ def main():
     # plt.title("Verhalten: Boxplot der Interaktionen")
     plt.xticks(rotation=30, ha="right")
     plt.tight_layout()
-    plt.savefig("fig_count_individual_interactions.png")
+    plt.savefig("fig_count_individual_interactions.pdf")
     plt.show()
 
 
