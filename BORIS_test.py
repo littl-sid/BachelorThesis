@@ -1,249 +1,152 @@
+from IPython import embed
 from scipy.stats import mannwhitneyu
 import matplotlib.pyplot as plt
-from matplotlib.patches import Patch
-import seaborn as sns
 import pandas as pd
 import glob
 import numpy as np
-from functions import get_interactions, get_periods
+from functions import get_periods, get_interactions, get_color, get_legend
 
 
 def main():
     # get all CSV files
-    all_files = glob.glob("BORIS_events/Trial*_V*_events.csv")
+    # dataset_1 = []
+    # for d in [
+    #     "BORIS_events/Trial3_V*_events.csv",
+    #     "BORIS_events/Trial5_V*_events.csv",
+    #     "BORIS_events/Trial6_V*_events.csv",
+    # ]:
+    #     dataset_1.extend(glob.glob(d))
 
-    # Listen für Light-Perioden
-    all_contact_light = []
-    all_chase_light = []
-    all_mouth_aggression_light = []
-    all_shoving_light = []
-    all_bluff_light = []
-    all_tail_whip_light = []
+    dataset_2 = []
+    for d in [
+        "BORIS_events/Trial7_V*_events.csv",
+        "BORIS_events/Trial8_V*_events.csv",
+        "BORIS_events/Trial10_V*_events.csv",
+        "BORIS_events/Trial11_V*_events.csv",
+        "BORIS_events/Trial12_V*_events.csv",
+    ]:
+        dataset_2.extend(glob.glob(d))
 
-    # Listen für Dark-Perioden
-    all_contact_dark = []
-    all_chase_dark = []
-    all_mouth_aggression_dark = []
-    all_shoving_dark = []
-    all_bluff_dark = []
-    all_tail_whip_dark = []
-
+    all_interactions_A = []
+    all_interactions_B = []
+    all_interactions_not_clear = []
     # go through files
-    for f in all_files:
+    for f in dataset_2:
         file = pd.read_csv(f)
 
-        # get light period and interactions
-        light_period = get_periods(file, "Licht")
-        interactions = get_interactions(file)
+        # get periods of Plattform locations for #fish > 2
+        plattform_A_period = get_periods(file, ["2 A", "3 A", "4 A"])
+        plattform_B_period = get_periods(file, ["2 B", "3 B", "4 B"])
 
-        # sort contacts if they are during light or not
+        # get all interaction events
+        interactions_def = [
+            "contact",
+            "Tail Whip",
+            "Mouth Aggression",
+            "shoving",
+            "bluff charge",
+            "chasing onset",
+        ]
+
+        interactions = file[
+            file["Behavior"].str.contains(
+                "|".join(interactions_def), case=False, na=False
+            )
+        ]
+
+        interactions_A = 0
+        interactions_B = 0
+        interactions_not_clear = 0
+        # sort contacts for their location
         for _, row in interactions.iterrows():
             interaction_time = row["Time"]
 
-            # check if contact is during light
-
-            # Counter light
-            counter_contact_light = 0
-            counter_chase_light = 0
-            counter_mouth_aggression_light = 0
-            counter_shoving_light = 0
-            counter_bluff_light = 0
-            counter_tail_whip_light = 0
-
-            # Counter dark
-            counter_contact_dark = 0
-            counter_chase_dark = 0
-            counter_mouth_aggression_dark = 0
-            counter_shoving_dark = 0
-            counter_bluff_dark = 0
-            counter_tail_whip_dark = 0
-
-            in_light = any(
-                start <= interaction_time <= end for (start, end) in light_period
+            in_A = any(
+                start <= interaction_time <= end for (start, end) in plattform_A_period
+            )
+            in_B = any(
+                start <= interaction_time <= end for (start, end) in plattform_B_period
             )
 
-            if in_light:
-                if row["Behavior"] == "contact":
-                    counter_contact_light += 1
-                elif row["Behavior"] == "chasing onset":
-                    counter_chase_light += 1
-                elif row["Behavior"] == "Mouth Aggression":
-                    counter_mouth_aggression_light += 1
-                elif row["Behavior"] == "shoving":
-                    counter_shoving_light += 1
-                elif row["Behavior"] == "bluff charge":
-                    counter_bluff_light += 1
-                elif row["Behavior"] == "Tail Whip":
-                    counter_tail_whip_light += 1
+            if in_A and in_B:
+                interactions_not_clear += 1
+            elif in_A:
+                interactions_A += 1
+            elif in_B:
+                interactions_B += 1
             else:
-                if row["Behavior"] == "contact":
-                    counter_contact_dark += 1
-                elif row["Behavior"] == "chasing onset":
-                    counter_chase_dark += 1
-                elif row["Behavior"] == "Mouth Aggression":
-                    counter_mouth_aggression_dark += 1
-                elif row["Behavior"] == "shoving":
-                    counter_shoving_dark += 1
-                elif row["Behavior"] == "bluff charge":
-                    counter_bluff_dark += 1
-                elif row["Behavior"] == "Tail Whip":
-                    counter_tail_whip_dark += 1
+                interactions_not_clear += 1
 
-        # Light
-        all_contact_light.append(counter_contact_light)
-        all_chase_light.append(counter_chase_light)
-        all_mouth_aggression_light.append(counter_mouth_aggression_light)
-        all_shoving_light.append(counter_shoving_light)
-        all_bluff_light.append(counter_bluff_light)
-        all_tail_whip_light.append(counter_tail_whip_light)
-
-        # Dark
-        all_contact_dark.append(counter_contact_dark)
-        all_chase_dark.append(counter_chase_dark)
-        all_mouth_aggression_dark.append(counter_mouth_aggression_dark)
-        all_shoving_dark.append(counter_shoving_dark)
-        all_bluff_dark.append(counter_bluff_dark)
-        all_tail_whip_dark.append(counter_tail_whip_dark)
+        all_interactions_A.append(interactions_A)
+        all_interactions_B.append(interactions_B)
+        all_interactions_not_clear.append(interactions_not_clear)
 
     # ----- Plot -----
-    # labels
-    labels = [
-        "contact",
-        "chasing",
-        "mouth aggression",
-        "shoving",
-        "bluff charge",
-        "tail whip",
-    ]
+    # Farben bestimmen
+    color_A, color_B = get_color(f)
 
-    # Data
-    all_light = [
-        all_contact_light,
-        all_chase_light,
-        all_mouth_aggression_light,
-        all_shoving_light,
-        all_bluff_light,
-        all_tail_whip_light,
-    ]
-
-    all_dark = [
-        all_contact_dark,
-        all_chase_dark,
-        all_mouth_aggression_dark,
-        all_shoving_dark,
-        all_bluff_dark,
-        all_tail_whip_dark,
-    ]
-
-    # ----- Plot -----
-    # labels
-    labels = [
-        "contact",
-        "chasing",
-        "mouth aggression",
-        "shoving",
-        "bluff charge",
-        "tail whip",
-    ]
-
-    # Data
-    all_light = [
-        all_contact_light,
-        all_chase_light,
-        all_mouth_aggression_light,
-        all_shoving_light,
-        all_bluff_light,
-        all_tail_whip_light,
-    ]
-
-    all_dark = [
-        all_contact_dark,
-        all_chase_dark,
-        all_mouth_aggression_dark,
-        all_shoving_dark,
-        all_bluff_dark,
-        all_tail_whip_dark,
-    ]
-
-    # --- Box Plot ---
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    positions_light = np.arange(len(labels)) - 0.2
-    positions_dark = np.arange(len(labels)) + 0.2
-
-    bpl = ax.boxplot(
-        all_light,
-        positions=positions_light,
-        widths=0.35,
+    # Boxplot zeichnen
+    bp = ax.boxplot(
+        [all_interactions_A, all_interactions_B, all_interactions_not_clear],
+        labels=["A", "B", "X"],
         patch_artist=True,
-        boxprops=dict(facecolor="#FFD700"),
+        boxprops=dict(color="black"),
         medianprops=dict(color="black"),
+        whiskerprops=dict(color="black"),
+        capprops=dict(color="black"),
+        flierprops=dict(marker="o", color="red", alpha=0.5),
     )
 
-    bpd = ax.boxplot(
-        all_dark,
-        positions=positions_dark,
-        widths=0.35,
-        patch_artist=True,
-        boxprops=dict(facecolor="#A9A9A9"),
-        medianprops=dict(color="black"),
+    # Farben einsetzen
+    colors = [color_A, color_B, "gray"]
+    for patch, col in zip(bp["boxes"], colors):
+        patch.set_facecolor(col)
+
+    # Legende
+    handles = get_legend(f)
+    ax.legend(handles=handles, loc="upper right")
+
+    # Stichprobengröße unter jede Box schreiben
+    ns = [
+        len(all_interactions_A),
+        len(all_interactions_B),
+        len(all_interactions_not_clear),
+    ]
+    for i, n in enumerate(ns, start=1):
+        ax.text(i, -0.05 * max(ns), f"n = {n}", ha="center", va="top", fontsize=10)
+
+    # ----- Statistischer Test A vs. B -----
+    # Mann-Whitney-U-Test
+    stat, p = mannwhitneyu(
+        all_interactions_A, all_interactions_B, alternative="two-sided"
     )
 
-    # axis, title, legend
+    # oder alternativ: t-Test
+    # stat, p = ttest_ind(all_interactions_A, all_interactions_B, equal_var=False)
+
+    # Signifikanz-Level bestimmen
+    if p < 0.001:
+        sig = "***"
+    elif p < 0.01:
+        sig = "**"
+    elif p < 0.05:
+        sig = "*"
+    else:
+        sig = "ns"
+
+    # Linie und Sternchen über A und B zeichnen
+    max_y = max(max(all_interactions_A), max(all_interactions_B))
+    y, h = max_y * 1.1, max_y * 0.05
+    ax.plot([1, 1, 2, 2], [y, y + h, y + h, y], lw=1.5, color="black")
+    ax.text(1.5, y + h, sig, ha="center", va="bottom", fontsize=12)
+
     ax.set_ylabel("# Interaktionen")
-    ax.set_xticks(np.arange(len(labels)))
-    ax.set_xticklabels(labels, rotation=30, ha="right")
-    ax.set_ylim(bottom=0)
+    ax.set_title("Interaktionen Plattformen")
 
-    # Mann-Whitney-U-Test and Significance
-    y_max = max(max(map(max, all_light)), max(map(max, all_dark)))
-    y_offset = y_max * 0.05
-
-    for i, (light_vals, dark_vals) in enumerate(zip(all_light, all_dark)):
-        stat, p = mannwhitneyu(light_vals, dark_vals, alternative="two-sided")
-
-        if p < 0.001:
-            sig = "***"
-        elif p < 0.01:
-            sig = "**"
-        elif p < 0.05:
-            sig = "*"
-        else:
-            sig = "ns"
-
-        ax.text(
-            i,
-            y_max + y_offset,
-            sig,
-            ha="center",
-            va="bottom",
-            fontsize=12,
-        )
-
-    # Legend with MW, SD, n
-    means_light = [np.mean(x) for x in all_light]
-    stds_light = [np.std(x, ddof=1) for x in all_light]
-    means_dark = [np.mean(x) for x in all_dark]
-    stds_dark = [np.std(x, ddof=1) for x in all_dark]
-
-    legend_labels = [
-        f"Tag: {label} (MW={mean:.2f} ± SD={std:.2f}, n={len(vals)})"
-        for label, mean, std, vals in zip(labels, means_light, stds_light, all_light)
-    ] + [
-        f"Nacht: {label} (MW={mean:.2f} ± SD={std:.2f}, n={len(vals)})"
-        for label, mean, std, vals in zip(labels, means_dark, stds_dark, all_dark)
-    ]
-
-    legend_colors = ["#FFD700"] * len(labels) + ["#A9A9A9"] * len(labels)
-    handles = [
-        Patch(facecolor=color, alpha=0.7, label=lab)
-        for color, lab in zip(legend_colors, legend_labels)
-    ]
-    ax.legend(handles=handles, bbox_to_anchor=(1.05, 1), loc="upper left", title="")
-
-    # --- Show Plot ---
     plt.tight_layout()
-    plt.savefig("fig_boxplot_light_dark.png")
+    plt.savefig(f"fig_plattform_interactions_test.png")
     plt.show()
 
 

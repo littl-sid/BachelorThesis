@@ -161,11 +161,32 @@ def main():
         width=0.6,
     )
 
+    # Stichprobengrößen pro Box
+    behaviors = dataframe["behavior"].unique()
+    phases = ["Tag", "Nacht"]
+
+    for i, behavior in enumerate(behaviors):
+        for j, phase in enumerate(phases):
+            vals = dataframe[
+                (dataframe["behavior"] == behavior) & (dataframe["phase"] == phase)
+            ]["value"]
+            n = len(vals)
+            # x-Position: i ± kleine Verschiebung je nach Hue
+            x_pos = i - 0.2 if phase == "Tag" else i + 0.2
+            plt.text(
+                x_pos,
+                -3,  # y-Position unterhalb der Box, ggf. anpassen
+                f"n={n}",
+                ha="center",
+                va="top",
+                fontsize=10,
+            )
+
     # Mann-Whitney-U-Test und Signifikanz
     for i, (light_vals, dark_vals) in enumerate(zip(all_light, all_dark)):
         stat, p = mannwhitneyu(light_vals, dark_vals, alternative="two-sided")
         max_val = max(max(light_vals), max(dark_vals))
-        y_offset = 0.05 * max_val  # 5% über dem Maximum
+        y_offset = 0
         if p < 0.001:
             sig = "***"
         elif p < 0.01:

@@ -65,9 +65,20 @@ def main():
     handles = []
     for label, counts, color in zip(labels, data, colors):
         n = len(counts)
-        handles.append(Patch(facecolor=color, label=f"{label} (n={n})"))
+        handles.append(Patch(facecolor=color, label=f"{label}"))
 
     ax.legend(handles=handles, loc="upper right")
+
+    for i, d in enumerate(data):
+        n = len(d)
+        plt.text(
+            i + 1,  # Boxplot-Position (1-basiert)
+            -3,  # y-Position unter der x-Achse, ggf. anpassen
+            f"n = {n}",
+            ha="center",
+            va="top",
+            fontsize=10,
+        )
 
     #  --- Man-Whitney-U-Test ---
     stat, p = mannwhitneyu(
