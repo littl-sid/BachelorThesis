@@ -1,5 +1,7 @@
-from IPython import embed
+from scipy.stats import mannwhitneyu
 import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
+import seaborn as sns
 import pandas as pd
 import glob
 import numpy as np
@@ -114,78 +116,137 @@ def main():
         "tail whip",
     ]
 
-    # MW and STD Light
-    means_light = [
-        np.mean(all_contact_light),
-        np.mean(all_chase_light),
-        np.mean(all_mouth_aggression_light),
-        np.mean(all_shoving_light),
-        np.mean(all_bluff_light),
-        np.mean(all_tail_whip_light),
+    # Data
+    all_light = [
+        all_contact_light,
+        all_chase_light,
+        all_mouth_aggression_light,
+        all_shoving_light,
+        all_bluff_light,
+        all_tail_whip_light,
     ]
 
-    stds_light = [
-        np.std(all_contact_light, ddof=1),
-        np.std(all_chase_light, ddof=1),
-        np.std(all_mouth_aggression_light, ddof=1),
-        np.std(all_shoving_light, ddof=1),
-        np.std(all_bluff_light, ddof=1),
-        np.std(all_tail_whip_light, ddof=1),
+    all_dark = [
+        all_contact_dark,
+        all_chase_dark,
+        all_mouth_aggression_dark,
+        all_shoving_dark,
+        all_bluff_dark,
+        all_tail_whip_dark,
     ]
 
-    # MW and STD Dark
-    means_dark = [
-        np.mean(all_contact_dark),
-        np.mean(all_chase_dark),
-        np.mean(all_mouth_aggression_dark),
-        np.mean(all_shoving_dark),
-        np.mean(all_bluff_dark),
-        np.mean(all_tail_whip_dark),
-    ]
+    means_light = [np.mean(x) for x in all_light]
+    means_dark = [np.mean(x) for x in all_dark]
+    stds_light = [np.std(x) for x in all_light]
+    stds_dark = [np.std(x) for x in all_dark]
 
-    stds_dark = [
-        np.std(all_contact_dark, ddof=1),
-        np.std(all_chase_dark, ddof=1),
-        np.std(all_mouth_aggression_dark, ddof=1),
-        np.std(all_shoving_dark, ddof=1),
-        np.std(all_bluff_dark, ddof=1),
-        np.std(all_tail_whip_dark, ddof=1),
-    ]
-
+    # --- Bar Plot ---
     # bars
-    x = np.arange(len(labels))
-    width = 0.35
+    # x = np.arange(len(labels))
+    # width = 0.35
 
-    fig, ax = plt.subplots(figsize=(10, 6))
-    rects1 = ax.bar(
-        x - width / 2,
-        means_light,
-        width,
-        yerr=stds_light,
-        capsize=5,
-        color="#FFD700",
-        label="Tag",
+    # fig, ax = plt.subplots(figsize=(10, 6))
+    # rects1 = ax.bar(
+    #     x - width / 2,
+    #     means_light,
+    #     width,
+    #     yerr=stds_light,
+    #     capsize=5,
+    #     color="#FFD700",
+    #     label="Tag",
+    # )
+    # rects2 = ax.bar(
+    #     x + width / 2,
+    #     means_dark,
+    #     width,
+    #     yerr=stds_dark,
+    #     capsize=5,
+    #     color="#A9A9A9",
+    #     label="Nacht",
+    # )
+
+    # # axis, title, legend
+    # ax.set_ylabel("# Interaktionen (MW ± SD)")
+    # ax.set_ylim(bottom=0)
+    # ax.set_title("einzelne Interaktionen Tag vs Nacht")
+    # ax.set_xticks(x)
+    # ax.set_xticklabels(labels, rotation=30, ha="right")
+    # ax.legend()
+
+    # ----- Violin Plot -----
+    # data in long format
+    records = []
+    for label, light_vals, dark_vals in zip(labels, all_light, all_dark):
+        for v in light_vals:
+            records.append({"behavior": label, "phase": "Tag", "value": v})
+        for v in dark_vals:
+            records.append({"behavior": label, "phase": "Nacht", "value": v})
+
+    dataframe = pd.DataFrame(records)
+
+    # Plot
+    plt.figure(figsize=(12, 6))
+    ax = sns.violinplot(
+        data=dataframe,
+        x="behavior",
+        y="value",
+        hue="phase",
+        split=True,
+        palette={"Tag": "#FFD700", "Nacht": "#A9A9A9"},
     )
-    rects2 = ax.bar(
-        x + width / 2,
-        means_dark,
-        width,
-        yerr=stds_dark,
-        capsize=5,
-        color="#A9A9A9",
-        label="Nacht",
-    )
 
-    # axis, title, legend
-    ax.set_ylabel("# Interaktionen (MW ± SD)")
-    ax.set_ylim(bottom=0)
-    ax.set_title("einzelne Interaktionen Tag vs Nacht")
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels, rotation=30, ha="right")
-    ax.legend()
+    # Mann-Whitney-U-Test and Significance
+    y_max = dataframe["value"].max()
+    y_offset = y_max - 0.55  # Abstand über der höchsten Violine
 
+    p_values = []
+    for i, (light_vals, dark_vals) in enumerate(zip(all_light, all_dark)):
+        stat, p = mannwhitneyu(light_vals, dark_vals, alternative="two-sided")
+        p_values.append(p)
+        # Annotation über der Violine
+        max_val = max(max(light_vals), max(dark_vals))
+        if p < 0.001:
+            sig = "***"
+        elif p < 0.01:
+            sig = "**"
+        elif p < 0.05:
+            sig = "*"
+        else:
+            sig = "ns"
+
+        ax.text(
+            i,  # x-Position = Kategorie-Index
+            y_max + y_offset,  # y-Position über allen Violinen
+            sig,
+            ha="center",
+            va="bottom",
+            fontsize=12,
+        )
+
+    # Legend with MW, SD, n
+    legend_labels = [
+        f"Tag: {label} (MW={mean:.2f} ± SD={std:.2f}, n={len(vals)})"
+        for label, mean, std, vals in zip(labels, means_light, stds_light, all_light)
+    ] + [
+        f"Nacht: {label} (MW={mean:.2f} ± SD={std:.2f}, n={len(vals)})"
+        for label, mean, std, vals in zip(labels, means_dark, stds_dark, all_dark)
+    ]
+
+    legend_colors = ["#FFD700"] * len(labels) + ["#A9A9A9"] * len(labels)
+    handles = [
+        Patch(facecolor=color, alpha=0.7, label=lab)
+        for color, lab in zip(legend_colors, legend_labels)
+    ]
+    ax.legend(handles=handles, bbox_to_anchor=(1.05, 1), loc="upper left", title="")
+
+    # Axis
+    plt.ylabel("# Interaktionen")
+    plt.xlabel("")
+    # plt.title("Interaktionen in Tag vs Nacht")
+    plt.xticks(rotation=30, ha="right")
+
+    # --- Show Plot --- (and save)
     plt.tight_layout()
-
     plt.savefig("fig_count_indivudal_interactions_lightphases.png")
     plt.show()
 
