@@ -3,7 +3,6 @@ from scipy.stats import mannwhitneyu
 import matplotlib.pyplot as plt
 import pandas as pd
 import glob
-import numpy as np
 from functions import get_periods, get_interactions, get_color, get_legend
 
 
