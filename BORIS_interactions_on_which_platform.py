@@ -60,7 +60,7 @@ def get_interactions_on_platforms(dataset, name):
     # Boxplot zeichnen
     bp = ax.boxplot(
         [all_interactions_A, all_interactions_B, all_interactions_not_clear],
-        labels=["A", "B", "X"],
+        labels=["A", "B", "nicht zugeordnet"],
         patch_artist=True,
         boxprops=dict(color="black"),
         medianprops=dict(color="black"),
