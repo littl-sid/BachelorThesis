@@ -1,4 +1,6 @@
 from IPython import embed
+from matplotlib.patches import Patch
+import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
 import glob
@@ -48,6 +50,7 @@ def main():
         all_tail_whip.append(tail_whip_count)
 
     # ----- Plot -----
+    plt.figure(figsize=(10, 6))
     # data summary
     data = [
         all_contact,
@@ -66,17 +69,48 @@ def main():
         "tail whip",
     ]
 
-    means = [np.mean(d) for d in data]
-    stds = [np.std(d, ddof=1) for d in data]  # ddof=1 → Stichproben-Standardabweichung
+    # --- Bar Plot ---
+    # means = np.array([np.mean(d) for d in data])  # calculate means
+    # q1 = np.array([np.percentile(d, 25) for d in data])  # 25th percentile
+    # q3 = np.array([np.percentile(d, 75) for d in data])  # 75th percentile
+    # lower_err = np.clip(means - q1, 0, None)  # not below 0
+    # upper_err = np.clip(q3 - means, 0, None)
+    # yerr = [lower_err, upper_err]
+
+    # plt.bar(labels, means, yerr=yerr, capsize=5)
+
+    # --- Boxplot ---
+    plt.boxplot(
+        data,
+        labels=labels,
+        patch_artist=True,  # fill boxes with color
+        boxprops=dict(facecolor="saddlebrown", color="black"),
+        medianprops=dict(color="gold"),
+        whiskerprops=dict(color="black"),
+        capprops=dict(color="black"),
+        flierprops=dict(marker="o", color="red", alpha=0.5),
+    )
 
     # Plot
-    plt.bar(labels, means, yerr=stds, capsize=5)
-    plt.ylabel("# Interaktionen (MW ± SD)")
-    plt.title("Verschiedene Interaktionen")
-    plt.xticks(rotation=30, ha="right")  # bessere Lesbarkeit
-    plt.tight_layout()
+    medians = [np.median(d) for d in data]
+    n = [len(d) for d in data]
+    handles = [
+        Patch(facecolor="saddlebrown", label=f"{label}: median={median:.1f}, n={n}")
+        for label, median, n in zip(labels, medians, n)
+    ]
 
-    plt.savefig("fig_count_indivdual_interactions_overall.png")
+    plt.legend(
+        handles=handles,
+        # title="Medians & Sample Size",
+        bbox_to_anchor=(1, 1),
+        loc="upper right",
+    )
+
+    plt.ylabel("# Interaktionen")
+    # plt.title("Verhalten: Boxplot der Interaktionen")
+    plt.xticks(rotation=30, ha="right")
+    plt.tight_layout()
+    plt.savefig("fig_count_individual_interactions_overall.png")
     plt.show()
 
 

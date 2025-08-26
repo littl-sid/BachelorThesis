@@ -32,7 +32,10 @@ def main():
     # ----- Plot -----
     plt.figure(figsize=(6, 6))
     plt.boxplot(
-        chase_durations, patch_artist=True, boxprops=dict(facecolor="saddlebrown")
+        chase_durations,
+        patch_artist=True,
+        boxprops=dict(facecolor="saddlebrown"),
+        medianprops=dict(color="gold"),
     )
     plt.ylabel("Chase Dauer [s]")
     plt.xticks([])

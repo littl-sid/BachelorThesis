@@ -35,17 +35,20 @@ def main():
         p = np.poly1d(z)
         x_line = np.linspace(min(x_axis), max(x_axis), 100)
         plt.plot(x_line, p(x_line), linestyle="-", alpha=0.8, color=color)
-        # Legende mit Steigung
+        # Legend
+        n = len(interaction_count)
         slope = z[0]
-        plt.scatter([], [], color=color, label=f"Trial {trial_number}: m={slope:.2f}")
+        plt.scatter(
+            [], [], color=color, label=f"Trial {trial_number}: m={slope:.2f}, n={n}"
+        )
 
         interaction_count = []
 
     # ----- Plot part 2 -----
     plt.xticks([1, 2, 3, 4], ["1", "2", "3", "4"])
     plt.ylabel("# Interaktionen")
-    plt.xlabel("Videos in Trial")
-    plt.title("Interaktionsanzahl über die Zeit")
+    plt.xlabel("Zeit über Videonummer")
+    # plt.title("Interaktionsanzahl über die Zeit")
     plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
     plt.tight_layout()
 
