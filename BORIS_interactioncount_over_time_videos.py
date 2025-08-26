@@ -1,59 +1,105 @@
 from IPython import embed
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
+from itertools import combinations
+from scipy.stats import mannwhitneyu
+import matplotlib.patches as mpatches
 import pandas as pd
 import glob
 import numpy as np
-from functions import sort_files, get_interactions, get_trial_and_video
+from functions import get_interactions, get_trial_and_video
 
 
 def main():
     # get all CSV files
     all_files = glob.glob("BORIS_events/Trial*_V*_events.csv")
 
-    # sort files for trial and video number
-    sorted_files = sort_files(all_files)
-
-    # color palette trials
-    colors = plt.cm.tab10.colors  # 10 Farben aus matplotlib Tab10
-
     # count in trial videos the interactions
     interaction_count = []
-    for trial in sorted_files:
-        for v in trial:
-            trial_number, video_number = get_trial_and_video(v)
-            color = colors[(trial_number - 1) % len(colors)]  # Farbe nach Trialnummer
+    for v in all_files:
+        _, video_number = get_trial_and_video(v)
 
-            file = pd.read_csv(v)
-            interactions = get_interactions(file)
-            interaction_count.append([len(interactions), video_number, color])
+        file = pd.read_csv(v)
+        interactions = get_interactions(file)
+        interaction_count.append([len(interactions), video_number])
 
-    x = np.array([i[1] for i in interaction_count])
-    y = np.array([i[0] for i in interaction_count])
-    color = np.array([i[2] for i in interaction_count])
+    # Data sorting
+    video_numbers = sorted(set(i[1] for i in interaction_count))
+    data = []
+    video = []
+    for vn in video_numbers:
+        counts = [i[0] for i in interaction_count if i[1] == vn]
+        data.append(counts)
+        video.append(vn)
 
-    plt.scatter(x, y, color=color)
+    # ----- Boxplot -----
+    plt.figure(figsize=(10, 6))
 
-    # ----- Trendlinie -----
-    coeffs = np.polyfit(x, y, 1)  # linear fit
-    slope = coeffs[0]
-    y_fit = np.poly1d(coeffs)(x)
-    plt.plot(x, y_fit, color="black", linestyle="-")
-
-    n = len(interaction_count)
-    line_handle = Line2D(
-        [0], [0], color="black", linestyle="-", label=f"m = {slope:.2f}, n={n}"
+    bp = plt.boxplot(
+        data,
+        labels=[f"Video {vn}" for vn in video],
+        patch_artist=True,
+        boxprops=dict(facecolor="white", color="black"),
+        medianprops=dict(color="black"),
+        whiskerprops=dict(color="black"),
+        capprops=dict(color="black"),
+        flierprops=dict(marker="o", color="red", alpha=0.5),
     )
-    plt.legend(handles=[line_handle], loc="upper right")
 
-    # ----- Plot part 2 -----
+    # Boxcolors
+    box_colors = ["gold", "orangered", "skyblue", "seagreen"]
+    for patch, color in zip(bp["boxes"], box_colors):
+        patch.set_facecolor(color)
+
+    handles = []
+
+    for vn, counts, color in zip(video, data, box_colors):
+        n = len(counts)
+        if vn in [1, 3]:
+            label_text = f"Tag auf Nacht (n={n})"
+        else:
+            label_text = f"Nacht auf Tag (n={n})"
+        handles.append(
+            mpatches.Patch(facecolor=color, label=f"Video {vn}: {label_text}")
+        )
+
+    # --- pairwise whitney-u-test ---
+    alpha = 0.05
+    positions = range(1, len(data) + 1)  # positions of boxes on x-axis
+
+    # function to convert p-value to stars
+    def significance_stars(p):
+        if p < 0.001:
+            return "***"
+        elif p < 0.01:
+            return "**"
+        elif p < 0.05:
+            return "*"
+        else:
+            return ""
+
+    # line offset to stagger multiple stars
+    base_offset = 5
+    step = 1
+    line_count = 0
+
+    # pairwise comparisons
+    for i, j in combinations(range(len(data)), 2):
+        stat, p = mannwhitneyu(data[i], data[j], alternative="two-sided")
+        stars = significance_stars(p)
+        if stars:
+            y = max(max(data[i]), max(data[j])) + base_offset + line_count * step
+            plt.plot([positions[i], positions[j]], [y, y], color="black", linewidth=1)
+            plt.text((positions[i] + positions[j]) / 2, y + 0.1, stars, ha="center")
+            line_count += 1
+
+    # ----- draw single legend -----
+    plt.legend(handles=handles, bbox_to_anchor=(1, 1), loc="upper right")
+
     plt.ylabel("# Interaktionen")
-    plt.xlabel("Video-Nr.")
-    # plt.title("Interaktionsanzahl über die Zeit")
-    # plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
+    plt.xticks(rotation=30, ha="right")
     plt.tight_layout()
-
-    plt.savefig("fig_interactioncount_over_time_overall.png")
+    plt.savefig("fig_interactioncount_over_time_videos.png")
     plt.show()
 
 

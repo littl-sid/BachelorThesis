@@ -1,5 +1,7 @@
 from IPython import embed
 import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
+from scipy.stats import mannwhitneyu
 import pandas as pd
 import glob
 import numpy as np
@@ -37,23 +39,58 @@ def main():
         all_interactions_light.append(interactions_light)
         all_interactions_dark.append(interactions_dark)
 
-    # ----- Plot ------
-    # means and stds
-    mean_light = np.mean(all_interactions_light)
-    mean_dark = np.mean(all_interactions_dark)
-    std_light = np.std(all_interactions_light, ddof=1)  # ddof=1 für Stichproben-Std
-    std_dark = np.std(all_interactions_dark, ddof=1)
+    # ----- Boxplot -----
+    data = [all_interactions_light, all_interactions_dark]
+    labels = ["Tag", "Nacht"]
+    colors = ["gold", "grey"]
 
-    # Plot
-    plt.bar(
-        ["Tag", "Nacht"],
-        [mean_light, mean_dark],
-        yerr=[std_light, std_dark],  # Fehlerbalken
-        capsize=5,  # kleine "Kappen" auf den Fehlerbalken
+    fig, ax = plt.subplots(figsize=(10, 6))
+    box = ax.boxplot(
+        data,
+        labels=labels,
+        patch_artist=True,
+        boxprops=dict(facecolor="white", color="black"),
+        medianprops=dict(color="black"),
+        whiskerprops=dict(color="black"),
+        capprops=dict(color="black"),
+        flierprops=dict(marker="o", color="red", alpha=0.5),
     )
-    plt.ylabel("# Interaktionen")
-    plt.title("Interaktionen Tag vs. Nacht")
 
+    # Boxen einfärben
+    for patch, color in zip(box["boxes"], colors):
+        patch.set_facecolor(color)
+        patch.set_alpha(0.7)
+
+    # Stichprobengröße n in die Legende aufnehmen
+    handles = []
+    for label, counts, color in zip(labels, data, colors):
+        n = len(counts)
+        handles.append(Patch(facecolor=color, label=f"{label} (n={n})"))
+
+    ax.legend(handles=handles, loc="upper right")
+
+    #  --- Man-Whitney-U-Test ---
+    stat, p = mannwhitneyu(
+        all_interactions_light, all_interactions_dark, alternative="two-sided"
+    )
+
+    # Sigifcance over boxes
+    max_val = max(max(all_interactions_light), max(all_interactions_dark))
+    y_offset = 0
+    if p < 0.001:
+        sig = "***"
+    elif p < 0.01:
+        sig = "**"
+    elif p < 0.05:
+        sig = "*"
+    else:
+        sig = "ns"
+
+    ax.text(1.5, max_val + y_offset, sig, ha="center", va="bottom", fontsize=14)
+
+    ax.set_ylabel("# Interaktionen")
+    # ax.set_title("Interaktionen Tag vs. Nacht")
+    plt.tight_layout()
     plt.savefig("fig_interactions_lightphases.png")
     plt.show()
 

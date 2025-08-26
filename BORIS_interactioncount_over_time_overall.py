@@ -14,26 +14,21 @@ def main():
     # sort files for trial and video number
     sorted_files = sort_files(all_files)
 
-    # color palette trials
-    colors = plt.cm.tab10.colors  # 10 Farben aus matplotlib Tab10
-
     # count in trial videos the interactions
     interaction_count = []
     for trial in sorted_files:
         for v in trial:
             trial_number, video_number = get_trial_and_video(v)
-            color = colors[(trial_number - 1) % len(colors)]  # Farbe nach Trialnummer
 
             file = pd.read_csv(v)
             interactions = get_interactions(file)
-            interaction_count.append([len(interactions), video_number, color])
+            interaction_count.append([len(interactions), video_number])
 
     # ----- Plot -----
     x = np.array([i[1] for i in interaction_count])
     y = np.array([i[0] for i in interaction_count])
-    color = np.array([i[2] for i in interaction_count])
 
-    plt.scatter(x, y, color=color)
+    plt.scatter(x, y, color="seagreen")
 
     # Trendlinie
     coeffs = np.polyfit(x, y, 1)  # linear fit
@@ -47,7 +42,7 @@ def main():
     )
     plt.legend(handles=[line_handle], loc="upper right")
 
-    # ----- Plot part 2 -----
+    # Plot
     plt.ylabel("# Interaktionen")
     plt.xlabel("Video-Nr.")
     # plt.title("Interaktionsanzahl über die Zeit")

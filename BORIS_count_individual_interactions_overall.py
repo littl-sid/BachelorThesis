@@ -84,33 +84,44 @@ def main():
         data,
         labels=labels,
         patch_artist=True,  # fill boxes with color
-        boxprops=dict(facecolor="saddlebrown", color="black"),
-        medianprops=dict(color="gold"),
+        boxprops=dict(facecolor="seagreen", color="black"),
+        medianprops=dict(color="black"),
         whiskerprops=dict(color="black"),
         capprops=dict(color="black"),
         flierprops=dict(marker="o", color="red", alpha=0.5),
     )
 
-    # Plot
-    medians = [np.median(d) for d in data]
-    n = [len(d) for d in data]
-    handles = [
-        Patch(facecolor="saddlebrown", label=f"{label}: median={median:.1f}, n={n}")
-        for label, median, n in zip(labels, medians, n)
-    ]
+    for i, d in enumerate(data):
+        n = len(d)
+        plt.text(
+            i + 1,  # Boxplot-Position (1-basiert)
+            -3,  # y-Position unter der x-Achse, ggf. anpassen
+            f"n = {n}",
+            ha="center",
+            va="top",
+            fontsize=10,
+        )
 
-    plt.legend(
-        handles=handles,
-        # title="Medians & Sample Size",
-        bbox_to_anchor=(1, 1),
-        loc="upper right",
-    )
+    # Plot
+    # medians = [np.median(d) for d in data]
+    # n = [len(d) for d in data]
+    # handles = [
+    #     Patch(facecolor="saddlebrown", label=f"{label}: median={median:.1f}, n={n}")
+    #     for label, median, n in zip(labels, medians, n)
+    # ]
+
+    # plt.legend(
+    #     handles=handles,
+    #     # title="Medians & Sample Size",
+    #     bbox_to_anchor=(1, 1),
+    #     loc="upper right",
+    # )
 
     plt.ylabel("# Interaktionen")
     # plt.title("Verhalten: Boxplot der Interaktionen")
     plt.xticks(rotation=30, ha="right")
     plt.tight_layout()
-    plt.savefig("fig_count_individual_interactions_overall.png")
+    plt.savefig("fig_count_individual_interactions.png")
     plt.show()
 
 

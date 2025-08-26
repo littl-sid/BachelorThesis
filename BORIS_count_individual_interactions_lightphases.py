@@ -34,6 +34,22 @@ def main():
 
         # get light period and interactions
         light_period = get_periods(file, "Licht")
+        # Counter light
+        counter_contact_light = 0
+        counter_chase_light = 0
+        counter_mouth_aggression_light = 0
+        counter_shoving_light = 0
+        counter_bluff_light = 0
+        counter_tail_whip_light = 0
+
+        # Counter dark
+        counter_contact_dark = 0
+        counter_chase_dark = 0
+        counter_mouth_aggression_dark = 0
+        counter_shoving_dark = 0
+        counter_bluff_dark = 0
+        counter_tail_whip_dark = 0
+
         interactions = get_interactions(file)
 
         # sort contacts if they are during light or not
@@ -41,22 +57,6 @@ def main():
             interaction_time = row["Time"]
 
             # check if contact is during light
-
-            # Counter light
-            counter_contact_light = 0
-            counter_chase_light = 0
-            counter_mouth_aggression_light = 0
-            counter_shoving_light = 0
-            counter_bluff_light = 0
-            counter_tail_whip_light = 0
-
-            # Counter dark
-            counter_contact_dark = 0
-            counter_chase_dark = 0
-            counter_mouth_aggression_dark = 0
-            counter_shoving_dark = 0
-            counter_bluff_dark = 0
-            counter_tail_whip_dark = 0
 
             in_light = any(
                 start <= interaction_time <= end for (start, end) in light_period
@@ -135,46 +135,13 @@ def main():
         all_tail_whip_dark,
     ]
 
-    means_light = [np.mean(x) for x in all_light]
-    means_dark = [np.mean(x) for x in all_dark]
-    stds_light = [np.std(x) for x in all_light]
-    stds_dark = [np.std(x) for x in all_dark]
+    # means_light = [np.mean(x) for x in all_light]
+    # means_dark = [np.mean(x) for x in all_dark]
+    # stds_light = [np.std(x) for x in all_light]
+    # stds_dark = [np.std(x) for x in all_dark]
 
-    # --- Bar Plot ---
-    # bars
-    # x = np.arange(len(labels))
-    # width = 0.35
-
-    # fig, ax = plt.subplots(figsize=(10, 6))
-    # rects1 = ax.bar(
-    #     x - width / 2,
-    #     means_light,
-    #     width,
-    #     yerr=stds_light,
-    #     capsize=5,
-    #     color="#FFD700",
-    #     label="Tag",
-    # )
-    # rects2 = ax.bar(
-    #     x + width / 2,
-    #     means_dark,
-    #     width,
-    #     yerr=stds_dark,
-    #     capsize=5,
-    #     color="#A9A9A9",
-    #     label="Nacht",
-    # )
-
-    # # axis, title, legend
-    # ax.set_ylabel("# Interaktionen (MW ± SD)")
-    # ax.set_ylim(bottom=0)
-    # ax.set_title("einzelne Interaktionen Tag vs Nacht")
-    # ax.set_xticks(x)
-    # ax.set_xticklabels(labels, rotation=30, ha="right")
-    # ax.legend()
-
-    # ----- Violin Plot -----
-    # data in long format
+    # ----- Boxplot -----
+    # Dataframe für Boxplot
     records = []
     for label, light_vals, dark_vals in zip(labels, all_light, all_dark):
         for v in light_vals:
@@ -184,27 +151,21 @@ def main():
 
     dataframe = pd.DataFrame(records)
 
-    # Plot
     plt.figure(figsize=(12, 6))
-    ax = sns.violinplot(
-        data=dataframe,
+    sns.boxplot(
         x="behavior",
         y="value",
         hue="phase",
-        split=True,
+        data=dataframe,
         palette={"Tag": "#FFD700", "Nacht": "#A9A9A9"},
+        width=0.6,
     )
 
-    # Mann-Whitney-U-Test and Significance
-    y_max = dataframe["value"].max()
-    y_offset = y_max - 0.55  # Abstand über der höchsten Violine
-
-    p_values = []
+    # Mann-Whitney-U-Test und Signifikanz
     for i, (light_vals, dark_vals) in enumerate(zip(all_light, all_dark)):
         stat, p = mannwhitneyu(light_vals, dark_vals, alternative="two-sided")
-        p_values.append(p)
-        # Annotation über der Violine
         max_val = max(max(light_vals), max(dark_vals))
+        y_offset = 0.05 * max_val  # 5% über dem Maximum
         if p < 0.001:
             sig = "***"
         elif p < 0.01:
@@ -213,41 +174,13 @@ def main():
             sig = "*"
         else:
             sig = "ns"
+        plt.text(i, max_val + y_offset, sig, ha="center", va="bottom", fontsize=12)
 
-        ax.text(
-            i,  # x-Position = Kategorie-Index
-            y_max + y_offset,  # y-Position über allen Violinen
-            sig,
-            ha="center",
-            va="bottom",
-            fontsize=12,
-        )
-
-    # Legend with MW, SD, n
-    legend_labels = [
-        f"Tag: {label} (MW={mean:.2f} ± SD={std:.2f}, n={len(vals)})"
-        for label, mean, std, vals in zip(labels, means_light, stds_light, all_light)
-    ] + [
-        f"Nacht: {label} (MW={mean:.2f} ± SD={std:.2f}, n={len(vals)})"
-        for label, mean, std, vals in zip(labels, means_dark, stds_dark, all_dark)
-    ]
-
-    legend_colors = ["#FFD700"] * len(labels) + ["#A9A9A9"] * len(labels)
-    handles = [
-        Patch(facecolor=color, alpha=0.7, label=lab)
-        for color, lab in zip(legend_colors, legend_labels)
-    ]
-    ax.legend(handles=handles, bbox_to_anchor=(1.05, 1), loc="upper left", title="")
-
-    # Axis
     plt.ylabel("# Interaktionen")
-    plt.xlabel("")
-    # plt.title("Interaktionen in Tag vs Nacht")
     plt.xticks(rotation=30, ha="right")
-
-    # --- Show Plot --- (and save)
+    plt.legend(title="", bbox_to_anchor=(1, 1), loc="upper right")
     plt.tight_layout()
-    plt.savefig("fig_count_indivudal_interactions_lightphases.png")
+    plt.savefig("fig_individual_interactions_lightphases.png")
     plt.show()
 
 
