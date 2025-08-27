@@ -10,7 +10,7 @@ from functions import get_periods, get_interactions
 
 def main():
     # alle passenden CSV-Dateien suchen
-    all_files = glob.glob("BORIS_events/Trial*_V*_events.csv")
+    all_files = glob.glob("BORIS_events_followup/Trial*_V*_events.csv")
 
     all_interactions_light = []
     all_interactions_dark = []

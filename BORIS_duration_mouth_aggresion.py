@@ -8,7 +8,7 @@ import numpy as np
 
 def main():
     # get all CSV files
-    all_files = glob.glob("BORIS_events/Trial*_V*_events.csv")
+    all_files = glob.glob("BORIS_events_followup/Trial*_V*_events.csv")
 
     mouth_periods = []
     # go through files
@@ -39,7 +39,6 @@ def main():
         durations.append(duration)
 
     # kurzer Eunschub Daten berechnen
-    embed()
     median = np.median(durations)
     print(f"Median: {median}")
 

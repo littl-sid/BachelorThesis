@@ -100,6 +100,15 @@ def get_interactions(file):
     return pd.DataFrame(interactions)
 
 
+def get_followup_interactions(file):
+    interactions_def = ["int A 1", "int A 2", "int B 1", "int B 2"]
+
+    interactions = file[
+        file["Behavior"].str.contains("|".join(interactions_def), case=False, na=False)
+    ]
+    return interactions
+
+
 # def get_interactions(file):
 #     # get the interaction events of the file
 #     interactions_def = [

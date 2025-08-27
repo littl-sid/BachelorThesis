@@ -8,7 +8,7 @@ import numpy as np
 
 def main():
     # get all CSV files
-    all_files = glob.glob("BORIS_events/Trial*_V*_events.csv")
+    all_files = glob.glob("BORIS_events_followup/Trial*_V*_events.csv")
 
     chase_periods = []
     # go through files
@@ -32,7 +32,6 @@ def main():
         duration = float(t[1]) - float(t[0])
         chase_durations.append(duration)
 
-    embed()
     # kurzer Eunschub Daten berechnen
     median = np.median(chase_durations)
     print(f"Median: {median}")

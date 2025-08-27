@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import glob
 import numpy as np
-from functions import get_periods, get_interactions, get_color, get_legend
+from functions import get_periods, get_followup_interactions, get_color, get_legend
 
 
 def get_interactions_on_platforms(dataset, name):
@@ -16,41 +16,24 @@ def get_interactions_on_platforms(dataset, name):
     for f in dataset:
         file = pd.read_csv(f)
 
-        # get periods of Plattform locations for #fish > 2
-        plattform_A_period = get_periods(file, ["2 A", "3 A", "4 A"])
-        plattform_B_period = get_periods(file, ["2 B", "3 B", "4 B"])
-
         # get all interaction events
-        interactions = get_interactions(file)
+        interactions = get_followup_interactions(file)
 
         interactions_A = 0
         interactions_B = 0
-        interactions_not_clear = 0
-        error = 0
-        # sort contacts for their location
+
+        # sort interations for their location
         for _, row in interactions.iterrows():
-            interaction_time = row["Time"]
+            in_A = row["Behavior"] in ["int A 1", "int A 2"]
+            in_B = row["Behavior"] in ["int B 1", "int B 2"]
 
-            in_A = any(
-                start <= interaction_time <= end for (start, end) in plattform_A_period
-            )
-            in_B = any(
-                start <= interaction_time <= end for (start, end) in plattform_B_period
-            )
-
-            if in_A and in_B:
-                interactions_not_clear += 1
-            elif in_A:
+            if in_A:
                 interactions_A += 1
             elif in_B:
                 interactions_B += 1
-            else:
-                interactions_not_clear += 1
 
         all_interactions_A.append(interactions_A)
         all_interactions_B.append(interactions_B)
-        all_interactions_not_clear.append(interactions_not_clear)
-        all_error.append(error)
 
     # ----- Plot -----
     # Farben bestimmen
@@ -65,8 +48,8 @@ def get_interactions_on_platforms(dataset, name):
 
     # Boxplot zeichnen
     bp = ax.boxplot(
-        [all_interactions_A, all_interactions_B, all_interactions_not_clear],
-        labels=["A", "B", "nicht zugeordnet"],
+        [all_interactions_A, all_interactions_B],
+        labels=["A", "B"],
         patch_artist=True,
         boxprops=dict(color="black"),
         medianprops=dict(color="black"),
@@ -88,7 +71,6 @@ def get_interactions_on_platforms(dataset, name):
     ns = [
         len(all_interactions_A),
         len(all_interactions_B),
-        len(all_interactions_not_clear),
     ]
     for i, n in enumerate(ns, start=1):
         ax.text(i, -0.1 * max(ns), f"n = {n}", ha="center", va="top", fontsize=8)

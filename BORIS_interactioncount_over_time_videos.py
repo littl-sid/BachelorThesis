@@ -12,7 +12,7 @@ from functions import get_interactions, get_trial_and_video
 
 def main():
     # get all CSV files
-    all_files = glob.glob("BORIS_events/Trial*_V*_events.csv")
+    all_files = glob.glob("BORIS_events_followup/Trial*_V*_events.csv")
 
     # count in trial videos the interactions
     interaction_count = []

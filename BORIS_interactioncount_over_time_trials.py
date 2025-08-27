@@ -8,7 +8,7 @@ from functions import sort_files, get_interactions, get_trial_and_video
 
 def main():
     # get all CSV files
-    all_files = glob.glob("BORIS_events/Trial*_V*_events.csv")
+    all_files = glob.glob("BORIS_events_followup/Trial*_V*_events.csv")
 
     # sort files for trial and video number
     sorted_files = sort_files(all_files)
