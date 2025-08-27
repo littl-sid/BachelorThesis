@@ -33,8 +33,12 @@ def main():
         duration = float(t[1]) - float(t[0])
         durations.append(duration)
 
+    # kurzer Eunschub Daten berechnen
+    median = np.median(durations)
+    print(f"Median: {median}")
+
     # ----- Plot -----
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(3, 2.25))  # 6, 4.5
     ax.boxplot(
         durations,
         patch_artist=True,

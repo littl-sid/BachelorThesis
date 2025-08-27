@@ -1,4 +1,5 @@
 from scipy.stats import mannwhitneyu
+from IPython import embed
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 import seaborn as sns
@@ -135,11 +136,6 @@ def main():
         all_tail_whip_dark,
     ]
 
-    # means_light = [np.mean(x) for x in all_light]
-    # means_dark = [np.mean(x) for x in all_dark]
-    # stds_light = [np.std(x) for x in all_light]
-    # stds_dark = [np.std(x) for x in all_dark]
-
     # ----- Boxplot -----
     # Dataframe für Boxplot
     records = []
@@ -151,13 +147,17 @@ def main():
 
     dataframe = pd.DataFrame(records)
 
-    plt.figure(figsize=(12, 6))
+    ## kurzer Einschub für Werte berechnen
+    median_table = dataframe.groupby(["behavior", "phase"])["value"].median().unstack()
+    print(median_table)
+
+    plt.figure(figsize=(6, 4.5))
     sns.boxplot(
         x="behavior",
         y="value",
         hue="phase",
         data=dataframe,
-        palette={"Tag": "#FFD700", "Nacht": "#A9A9A9"},
+        palette={"Tag": "gold", "Nacht": "grey"},
         width=0.6,
     )
 
@@ -175,11 +175,11 @@ def main():
             x_pos = i - 0.2 if phase == "Tag" else i + 0.2
             plt.text(
                 x_pos,
-                -3,  # y-Position unterhalb der Box, ggf. anpassen
+                -1.5,  # y-Position unterhalb der Box, ggf. anpassen
                 f"n={n}",
                 ha="center",
                 va="top",
-                fontsize=10,
+                fontsize=8,
             )
 
     # Mann-Whitney-U-Test und Signifikanz
@@ -198,6 +198,7 @@ def main():
         plt.text(i, max_val + y_offset, sig, ha="center", va="bottom", fontsize=12)
 
     plt.ylabel("# Interaktionen")
+    plt.xlabel("")
     plt.xticks(rotation=30, ha="right")
     plt.legend(title="", bbox_to_anchor=(1, 1), loc="upper right")
     plt.tight_layout()

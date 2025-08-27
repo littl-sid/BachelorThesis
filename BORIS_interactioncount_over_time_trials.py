@@ -16,7 +16,7 @@ def main():
     # color palette trials
     colors = plt.cm.tab10.colors  # 10 Farben aus matplotlib Tab10
 
-    fig, ax = plt.subplots(figsize=(10, 6))  # nur einmal
+    fig, ax = plt.subplots(figsize=(6, 4.5))
 
     for trial in sorted_files:
         interaction_count = []

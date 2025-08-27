@@ -44,7 +44,12 @@ def main():
     labels = ["Tag", "Nacht"]
     colors = ["gold", "grey"]
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    # kurzer Einschub zur Datenberechnung
+    median_light = np.median(data[0])
+    median_dark = np.median(data[1])
+    print(f"Median Tag: {median_light}, Median Nacht: {median_dark}")
+
+    fig, ax = plt.subplots(figsize=(6, 4.5))
     box = ax.boxplot(
         data,
         labels=labels,
@@ -73,11 +78,11 @@ def main():
         n = len(d)
         plt.text(
             i + 1,  # Boxplot-Position (1-basiert)
-            -3,  # y-Position unter der x-Achse, ggf. anpassen
+            -1.5,  # y-Position unter der x-Achse, ggf. anpassen
             f"n = {n}",
             ha="center",
             va="top",
-            fontsize=10,
+            fontsize=8,
         )
 
     #  --- Man-Whitney-U-Test ---
@@ -97,7 +102,7 @@ def main():
     else:
         sig = "ns"
 
-    ax.text(1.5, max_val + y_offset, sig, ha="center", va="bottom", fontsize=14)
+    ax.text(1.5, max_val + y_offset, sig, ha="center", va="top", fontsize=12)
 
     ax.set_ylabel("# Interaktionen")
     # ax.set_title("Interaktionen Tag vs. Nacht")

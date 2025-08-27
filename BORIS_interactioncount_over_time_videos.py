@@ -33,7 +33,12 @@ def main():
         video.append(vn)
 
     # ----- Boxplot -----
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(6, 4.5))
+
+    # kurzer Einschub für Berechnungen
+    medians = [np.median(d) for d in data]
+    median_table = pd.DataFrame({"video": video, "median": medians})
+    print(median_table)
 
     bp = plt.boxplot(
         data,
@@ -52,15 +57,22 @@ def main():
         patch.set_facecolor(color)
 
     handles = []
-
     for vn, counts, color in zip(video, data, box_colors):
-        n = len(counts)
         if vn in [1, 3]:
-            label_text = f"Tag auf Nacht (n={n})"
+            label_text = "Tag auf Nacht"
         else:
-            label_text = f"Nacht auf Tag (n={n})"
-        handles.append(
-            mpatches.Patch(facecolor=color, label=f"Video {vn}: {label_text}")
+            label_text = "Nacht auf Tag"
+        handles.append(mpatches.Patch(facecolor=color, label=f"{vn}: {label_text}"))
+
+    for i, d in enumerate(data):
+        n = len(d)
+        plt.text(
+            i + 1,  # Boxplot-Position (1-basiert)
+            -1.5,  # y-Position unter der x-Achse, ggf. anpassen
+            f"n = {n}",
+            ha="center",
+            va="top",
+            fontsize=8,
         )
 
     # --- pairwise whitney-u-test ---

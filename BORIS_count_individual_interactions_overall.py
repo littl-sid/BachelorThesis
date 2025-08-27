@@ -50,7 +50,7 @@ def main():
         all_tail_whip.append(tail_whip_count)
 
     # ----- Plot -----
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(6, 4.5))
     # data summary
     data = [
         all_contact,
@@ -95,12 +95,18 @@ def main():
         n = len(d)
         plt.text(
             i + 1,  # Boxplot-Position (1-basiert)
-            -3,  # y-Position unter der x-Achse, ggf. anpassen
+            -1.5,  # y-Position unter der x-Achse, ggf. anpassen
             f"n = {n}",
             ha="center",
             va="top",
-            fontsize=10,
+            fontsize=8,
         )
+
+    # kurzer Einschub für Berechnungen
+    # Median berechnen
+    medians = [np.median(d) for d in data]
+    median_table = pd.DataFrame({"behavior": labels, "median": medians})
+    print(median_table)
 
     # Plot
     # medians = [np.median(d) for d in data]

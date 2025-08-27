@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from IPython import embed
 import matplotlib.patches as mpatches
 import pandas as pd
 import glob
@@ -31,8 +32,13 @@ def main():
         duration = float(t[1]) - float(t[0])
         chase_durations.append(duration)
 
+    embed()
+    # kurzer Eunschub Daten berechnen
+    median = np.median(chase_durations)
+    print(f"Median: {median}")
+
     # ----- Plot -----
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(3, 2.25))  # 6, 4.5
     ax.boxplot(
         chase_durations,
         patch_artist=True,
@@ -47,11 +53,11 @@ def main():
     n = len(chase_durations)
     plt.text(
         1,  # x position
-        -0.1,  # y-Position unter der x-Achse, ggf. anpassen
+        -0.5,  # y-Position unter der x-Achse, ggf. anpassen
         f"n = {n}",
         ha="center",
         va="top",
-        fontsize=10,
+        fontsize=8,
     )
 
     plt.tight_layout()

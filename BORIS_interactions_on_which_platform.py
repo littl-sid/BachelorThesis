@@ -3,6 +3,7 @@ from scipy.stats import mannwhitneyu
 import matplotlib.pyplot as plt
 import pandas as pd
 import glob
+import numpy as np
 from functions import get_periods, get_interactions, get_color, get_legend
 
 
@@ -55,7 +56,12 @@ def get_interactions_on_platforms(dataset, name):
     # Farben bestimmen
     color_A, color_B = get_color(f)
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(6, 4.5))
+
+    # kurzer Einschub für Berechnungen
+    median_A = np.median(all_interactions_A)
+    median_B = np.median(all_interactions_B)
+    print(f"{name}: Median A: {median_A}, Median B: {median_B}")
 
     # Boxplot zeichnen
     bp = ax.boxplot(
@@ -85,7 +91,7 @@ def get_interactions_on_platforms(dataset, name):
         len(all_interactions_not_clear),
     ]
     for i, n in enumerate(ns, start=1):
-        ax.text(i, -0.05 * max(ns), f"n = {n}", ha="center", va="top", fontsize=10)
+        ax.text(i, -0.1 * max(ns), f"n = {n}", ha="center", va="top", fontsize=8)
 
     # ----- Statistischer Test A vs. B -----
     # Mann-Whitney-U-Test
@@ -113,7 +119,7 @@ def get_interactions_on_platforms(dataset, name):
     ax.text(1.5, y + h, sig, ha="center", va="bottom", fontsize=12)
 
     ax.set_ylabel("# Interaktionen")
-    ax.set_title("Interaktionen Plattformen")
+    # ax.set_title("Interaktionen Plattformen")
 
     plt.tight_layout()
     plt.savefig(f"fig_plattform_interactions_{name}.pdf")
