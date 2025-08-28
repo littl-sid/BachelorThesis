@@ -1,6 +1,4 @@
-from IPython import embed
 import matplotlib.pyplot as plt
-from matplotlib.patches import Patch
 from itertools import combinations
 from scipy.stats import mannwhitneyu
 import matplotlib.patches as mpatches
@@ -37,9 +35,12 @@ def main():
 
     # kurzer Einschub für Berechnungen
     medians = [np.median(d) for d in data]
-    median_table = pd.DataFrame({"video": video, "median": medians})
-    print(median_table)
-
+    means = [np.mean(d) for d in data]
+    stds = [np.std(d, ddof=1) for d in data]
+    statistics_table = pd.DataFrame(
+        {"Video Nr.": video, "median": medians, "mean": means, "std": stds}
+    )
+    print(statistics_table)
     bp = plt.boxplot(
         data,
         labels=[f"Video {vn}" for vn in video],

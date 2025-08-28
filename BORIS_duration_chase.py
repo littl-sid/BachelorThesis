@@ -1,6 +1,4 @@
 import matplotlib.pyplot as plt
-from IPython import embed
-import matplotlib.patches as mpatches
 import pandas as pd
 import glob
 import numpy as np
@@ -34,7 +32,9 @@ def main():
 
     # kurzer Eunschub Daten berechnen
     median = np.median(chase_durations)
-    print(f"Median: {median}")
+    mean = np.mean(chase_durations)
+    std = np.std(chase_durations)
+    print(f"Median: {median:.2f}, Mean: {mean:.2f}, Std: {std:.2f}")
 
     # ----- Plot -----
     fig, ax = plt.subplots(figsize=(3, 2.25))  # 6, 4.5

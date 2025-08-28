@@ -1,4 +1,3 @@
-from IPython import embed
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from scipy.stats import mannwhitneyu
@@ -46,8 +45,15 @@ def main():
 
     # kurzer Einschub zur Datenberechnung
     median_light = np.median(data[0])
+    mean_light = np.mean(data[0])
+    std_light = np.std(data[0])
     median_dark = np.median(data[1])
-    print(f"Median Tag: {median_light}, Median Nacht: {median_dark}")
+    mean_dark = np.mean(data[1])
+    std_dark = np.std(data[1])
+    print(
+        f"Tag: Median {median_light:.2f}, Mean {mean_light:.2f}, Std {std_light:.2f}\n"
+        f"Nacht: Median {median_dark:.2f}, Mean {mean_dark:.2f}, Std {std_dark:.2f}"
+    )
 
     fig, ax = plt.subplots(figsize=(6, 4.5))
     box = ax.boxplot(

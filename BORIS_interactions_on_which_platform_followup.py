@@ -1,17 +1,16 @@
-from IPython import embed
 from scipy.stats import mannwhitneyu
 import matplotlib.pyplot as plt
 import pandas as pd
 import glob
 import numpy as np
-from functions import get_periods, get_followup_interactions, get_color, get_legend
+from functions import get_followup_interactions, get_color, get_legend
 
 
 def get_interactions_on_platforms(dataset, name):
     all_interactions_A = []
     all_interactions_B = []
-    all_interactions_not_clear = []
-    all_error = []
+    # all_interactions_not_clear = []
+    # all_error = []
     # go through files
     for f in dataset:
         file = pd.read_csv(f)
@@ -43,8 +42,14 @@ def get_interactions_on_platforms(dataset, name):
 
     # kurzer Einschub für Berechnungen
     median_A = np.median(all_interactions_A)
+    mean_A = np.mean(all_interactions_A)
+    std_A = np.std(all_interactions_A)
     median_B = np.median(all_interactions_B)
-    print(f"{name}: Median A: {median_A}, Median B: {median_B}")
+    mean_B = np.mean(all_interactions_B)
+    std_B = np.std(all_interactions_B)
+    print(f"{name}:")
+    print(f"  A: Median = {median_A:.2f}, Mean = {mean_A:.2f}, Std = {std_A:.2f}")
+    print(f"  B: Median = {median_B:.2f}, Mean = {mean_B:.2f}, Std = {std_B:.2f}")
 
     # Boxplot zeichnen
     bp = ax.boxplot(
@@ -65,7 +70,7 @@ def get_interactions_on_platforms(dataset, name):
 
     # Legende
     handles = get_legend(f)
-    ax.legend(handles=handles, loc="upper right")
+    ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(1, 1))
 
     # Stichprobengröße unter jede Box schreiben
     ns = [

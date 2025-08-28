@@ -1,5 +1,4 @@
 from scipy.stats import mannwhitneyu
-from IPython import embed
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
@@ -36,11 +35,14 @@ def main():
     # labels
     labels = ["3", "4", "5", "6", "7", "8", "10", "11", "12"]
 
-    # Berechung Werte
-    means = [np.mean(x) for x in interactions_trials]
-    stds = [np.std(x, ddof=1) for x in interactions_trials]
-    data_table = pd.DataFrame({"Trial": labels, "Mean": means, "Std": stds})
-    print(data_table)
+    # kurzer Einschub für Berechnungen
+    medians = [np.median(d) for d in interactions_trials]
+    means = [np.mean(d) for d in interactions_trials]
+    stds = [np.std(d, ddof=1) for d in interactions_trials]
+    statistics_table = pd.DataFrame(
+        {"behavior": labels, "median": medians, "mean": means, "std": stds}
+    )
+    print(statistics_table)
 
     # --- Boxplot ---
     records = []

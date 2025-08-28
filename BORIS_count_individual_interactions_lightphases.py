@@ -1,11 +1,8 @@
 from scipy.stats import mannwhitneyu
-from IPython import embed
 import matplotlib.pyplot as plt
-from matplotlib.patches import Patch
 import seaborn as sns
 import pandas as pd
 import glob
-import numpy as np
 from functions import get_interactions, get_periods
 
 
@@ -148,8 +145,12 @@ def main():
     dataframe = pd.DataFrame(records)
 
     ## kurzer Einschub für Werte berechnen
-    median_table = dataframe.groupby(["behavior", "phase"])["value"].median().unstack()
-    print(median_table)
+    statistics_table = (
+        dataframe.groupby(["behavior", "phase"])["value"]
+        .agg(median="median", mean="mean", std="std")
+        .unstack()
+    )
+    print(statistics_table)
 
     plt.figure(figsize=(6, 4.5))
     sns.boxplot(

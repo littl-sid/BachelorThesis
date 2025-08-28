@@ -1,6 +1,3 @@
-from IPython import embed
-from matplotlib.patches import Patch
-import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
 import glob
@@ -103,10 +100,13 @@ def main():
         )
 
     # kurzer Einschub für Berechnungen
-    # Median berechnen
     medians = [np.median(d) for d in data]
-    median_table = pd.DataFrame({"behavior": labels, "median": medians})
-    print(median_table)
+    means = [np.mean(d) for d in data]
+    stds = [np.std(d, ddof=1) for d in data]
+    statistics_table = pd.DataFrame(
+        {"behavior": labels, "median": medians, "mean": means, "std": stds}
+    )
+    print(statistics_table)
 
     # Plot
     # medians = [np.median(d) for d in data]
