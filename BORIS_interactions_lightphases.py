@@ -78,7 +78,7 @@ def main():
         n = len(counts)
         handles.append(Patch(facecolor=color, label=f"{label}"))
 
-    ax.legend(handles=handles, loc="upper right")
+    # ax.legend(handles=handles, loc="upper right")
 
     for i, d in enumerate(data):
         n = len(d)

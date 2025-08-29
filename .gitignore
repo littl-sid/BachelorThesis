@@ -580,3 +580,7 @@ pyrightconfig.json
 *.tar
 *.gz
 *.7z
+wavetracker/fine_freqs.npy
+wavetracker/fine_spec_shape.npy
+wavetracker/fine_spec.npy
+wavetracker/fine_times.npy

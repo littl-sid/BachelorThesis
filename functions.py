@@ -162,13 +162,13 @@ def get_legend(file):
 
     if 1 <= trial <= 6:
         legend = [
-            plt.Line2D([0], [0], color=color_A, lw=4, label="A schlechte Platte"),
-            plt.Line2D([0], [0], color=color_B, lw=4, label="B gute Platte"),
+            plt.Line2D([0], [0], color=color_A, lw=4, label="A schlechte Plattform"),
+            plt.Line2D([0], [0], color=color_B, lw=4, label="B gute Plattform"),
         ]
     elif 7 <= trial <= 12:
         legend = [
-            plt.Line2D([0], [0], color=color_A, lw=4, label="A gute Platte"),
-            plt.Line2D([0], [0], color=color_B, lw=4, label="B schlechte Platte"),
+            plt.Line2D([0], [0], color=color_A, lw=4, label="A gute Plattform"),
+            plt.Line2D([0], [0], color=color_B, lw=4, label="B schlechte Plattform"),
         ]
     else:
         legend = []
