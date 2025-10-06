@@ -46,8 +46,6 @@ def main():
         count_followup = count_followup_interactions(trial)
         interactions_followup.append(count_followup)
 
-    embed()
-
     print(f"old:{interactions_old} followup: {interactions_followup}")
 
 

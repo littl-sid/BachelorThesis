@@ -59,6 +59,26 @@ def sort_files(files):
     return T3, T4, T5, T6, T7, T8, T10, T11, T12
 
 
+def sort_for_videos(files):
+    V1 = []
+    V2 = []
+    V3 = []
+    V4 = []
+
+    for f in files:
+        _, video_number = get_trial_and_video(f)
+
+        if video_number == 1:
+            V1.append(f)
+        elif video_number == 2:
+            V2.append(f)
+        elif video_number == 3:
+            V3.append(f)
+        elif video_number == 4:
+            V4.append(f)
+    return V1, V2, V3, V4
+
+
 def get_all_interactions(file):
     # get the interaction events of the file
     interactions_def = [

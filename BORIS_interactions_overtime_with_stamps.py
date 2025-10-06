@@ -4,27 +4,7 @@ from IPython import embed
 import glob
 import numpy as np
 from matplotlib.lines import Line2D
-from functions import sort_files, get_interactions, get_trial_and_video
-
-
-def sort_for_videos(files):
-    V1 = []
-    V2 = []
-    V3 = []
-    V4 = []
-
-    for f in files:
-        _, video_number = get_trial_and_video(f)
-
-        if video_number == 1:
-            V1.append(f)
-        elif video_number == 2:
-            V2.append(f)
-        elif video_number == 3:
-            V3.append(f)
-        elif video_number == 4:
-            V4.append(f)
-    return V1, V2, V3, V4
+from functions import sort_files, get_interactions, sort_for_videos
 
 
 def get_stamps_plot(files, video_number):
