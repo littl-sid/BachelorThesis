@@ -29,7 +29,7 @@ def get_interactions_on_platforms(dataset, ax):
 
     bp = ax.boxplot(
         [all_interactions_A, all_interactions_B],
-        labels=["A", "B"],
+        labels=["links", "rechts"],
         patch_artist=True,
         boxprops=dict(color="black"),
         medianprops=dict(color="black"),

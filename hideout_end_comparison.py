@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from IPython import embed
 import numpy as np
+from scipy.stats import pearsonr
 
 # Fish Lists
 all_fish = [  # Frequency, Size, hideout at the end, Trial number
@@ -105,7 +106,15 @@ def plot_by_attribute(attribute_index, name, name_2):
             all_ranks.append(rank)
             all_hide_nums.append(hide_num)
 
-        plt.scatter(ranks, hide_nums, s=50, color=color)
+        scatter = 0.2
+        ranks = np.array(ranks) + np.random.uniform(
+            low=-scatter, high=scatter, size=len(ranks)
+        )
+        hide_nums = np.array(hide_nums) + np.random.uniform(
+            low=-scatter, high=scatter, size=len(hide_nums)
+        )
+
+        plt.scatter(ranks, hide_nums, s=10, color=color)
         z = np.polyfit(ranks, hide_nums, 1)
         p = np.poly1d(z)
         x_line = np.linspace(min(ranks), max(ranks), 100)
@@ -116,6 +125,10 @@ def plot_by_attribute(attribute_index, name, name_2):
         plt.scatter(
             [], [], color=color, label=f"Trial {trial_number}: m={slope:.2f} (n={n})"
         )
+
+    # Pearson für alle Daten
+    r_all, pval_all = pearsonr(all_ranks, all_hide_nums)
+    print(f"{name} – Gesamt: r={r_all:.2f}, p={pval_all:.3f}")
 
     z_all = np.polyfit(all_ranks, all_hide_nums, 1)
     p_all = np.poly1d(z_all)
@@ -130,7 +143,7 @@ def plot_by_attribute(attribute_index, name, name_2):
         [1, 2, 3, 4], ["große Röhre", "mittlere Röhre", "kleine Röhre", "andere"]
     )
     plt.xlabel(f"Rang nach {name_2}")
-    plt.ylabel("Versteck Qualität")
+    plt.ylabel("Versteckqualität")
     plt.gca().invert_xaxis()
     plt.gca().invert_yaxis()
     plt.legend(loc="center left", bbox_to_anchor=(1, 0.5), fontsize=8)
@@ -167,7 +180,15 @@ def plot_frequency_vs_size():
             all_x_vals.append(freq_ranks[key])
             all_y_vals.append(size_ranks[key])
 
-        plt.scatter(x_vals, y_vals, s=50, color=color)
+        scatter = 0.2
+        x_vals = np.array(x_vals) + np.random.uniform(
+            low=-scatter, high=scatter, size=len(x_vals)
+        )
+        y_vals = np.array(y_vals) + np.random.uniform(
+            low=-scatter, high=scatter, size=len(y_vals)
+        )
+
+        plt.scatter(x_vals, y_vals, s=10, color=color)
         z = np.polyfit(x_vals, y_vals, 1)
         p = np.poly1d(z)
         x_line = np.linspace(min(x_vals), max(x_vals), 100)
@@ -179,6 +200,10 @@ def plot_frequency_vs_size():
             [], [], color=color, label=f"Trial {trial_number}: m={slope:.2f} (n={n})"
         )
 
+    # Pearson für alle Daten
+    r_all, pval_all = pearsonr(all_x_vals, all_y_vals)
+    print(f"Frequenz vs Größe – Gesamt: r={r_all:.2f}, p={pval_all:.3f}")
+
     z_all = np.polyfit(all_x_vals, all_y_vals, 1)
     p_all = np.poly1d(z_all)
     x_line_all = np.linspace(min(all_x_vals), max(all_x_vals), 100)
@@ -189,7 +214,7 @@ def plot_frequency_vs_size():
 
     plt.xticks([1, 2, 3, 4])
     plt.yticks([1, 2, 3, 4])
-    plt.xlabel("Rang nach Frequenz")
+    plt.xlabel("Rang nach EODf")
     plt.ylabel("Rang nach Größe")
     plt.gca().invert_xaxis()
     plt.gca().invert_yaxis()
@@ -201,7 +226,7 @@ def plot_frequency_vs_size():
 
 def main():
     plot_by_attribute(attribute_index=1, name="size", name_2="Größe")
-    plot_by_attribute(attribute_index=0, name="frequency", name_2="Frequenz")
+    plot_by_attribute(attribute_index=0, name="frequency", name_2="EODf")
     plot_frequency_vs_size()
 
 
