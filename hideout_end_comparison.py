@@ -114,7 +114,7 @@ def plot_by_attribute(attribute_index, name, name_2):
             low=-scatter, high=scatter, size=len(hide_nums)
         )
 
-        plt.scatter(ranks, hide_nums, s=10, color=color)
+        plt.scatter(ranks, hide_nums, s=20, color=color)
         z = np.polyfit(ranks, hide_nums, 1)
         p = np.poly1d(z)
         x_line = np.linspace(min(ranks), max(ranks), 100)
@@ -188,7 +188,7 @@ def plot_frequency_vs_size():
             low=-scatter, high=scatter, size=len(y_vals)
         )
 
-        plt.scatter(x_vals, y_vals, s=10, color=color)
+        plt.scatter(x_vals, y_vals, s=20, color=color)
         z = np.polyfit(x_vals, y_vals, 1)
         p = np.poly1d(z)
         x_line = np.linspace(min(x_vals), max(x_vals), 100)

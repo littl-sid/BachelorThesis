@@ -2,7 +2,11 @@ from scipy.stats import mannwhitneyu
 import matplotlib.pyplot as plt
 import pandas as pd
 import glob
-from functions import get_followup_interactions, get_color, get_legend
+from functions import (
+    get_followup_interactions,
+    get_color,
+    get_legend,
+)
 
 
 def get_interactions_on_platforms(dataset, ax):
@@ -64,7 +68,7 @@ def get_interactions_on_platforms(dataset, ax):
     ax.text(1.5, y + h, sig, ha="center", va="bottom", fontsize=12)
 
     handles = get_legend(dataset[0])
-    ax.legend(handles=handles, loc="upper right", fontsize=8)
+    # ax.legend(handles=handles, loc="upper right", fontsize=8)
 
     return ax
 
@@ -89,16 +93,18 @@ def main():
     ]:
         dataset_2.extend(glob.glob(d))
 
-    # Subplots mit gemeinsamer Y-Achse
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(6, 4.5), sharey=True)
 
     get_interactions_on_platforms(dataset_1, ax1)
     get_interactions_on_platforms(dataset_2, ax2)
 
-    # Gemeinsames Y-Label nur links
     ax1.set_ylabel("# Interaktionen")
 
-    plt.tight_layout()
+    # Eine gemeinsame Legende unten hinzufügen
+    handles = get_legend(dataset_1[0])  # reicht, da Farben gleich
+    fig.legend(handles=handles, loc="upper center", ncol=2, fontsize=8, frameon=False)
+
+    plt.tight_layout(rect=[0, 0, 1, 0.95])  # Platz für Legende oben
     plt.savefig("fig_plattform_interactions_two_datasets.pdf")
     plt.show()
 
