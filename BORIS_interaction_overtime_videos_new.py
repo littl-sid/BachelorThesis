@@ -59,13 +59,10 @@ def main():
     # Mann-Whitney-U Tests für alle 4 Videos
     video_data = [df[df["video"] == i]["count"].values for i in range(1, 5)]
     pairs = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)]  # alle 6 Kombinationen
-    n_tests = len(pairs)  # für Bonferroni Korrektur
+    m = len(pairs)
 
     for i, j in pairs:
         stat, p = mannwhitneyu(video_data[i], video_data[j], alternative="two-sided")
-
-        # Bonferroni-Korrektur
-        p = min(p * n_tests, 1.0)
 
         if p < 0.05:  # nur Signifikanz anzeigen
             if p < 0.001:
@@ -92,6 +89,11 @@ def main():
             # Legende
             handles = [Line2D([0], [0], color=color_map[i], lw=6) for i in range(1, 5)]
             ax.legend(handles, [label_map[i] for i in range(1, 5)], loc="upper right")
+
+        # Bonferroni-Korrektur
+        p_corr = np.minimum(p * m, 1)
+        a_corr = [0.05 / m, 0.01 / m, 0.001 / m]
+        print(i, j, "p-Wert:", p, "Korrektur:", p_corr, "Signifkanzniveau:", a_corr)
 
     plt.tight_layout()
     plt.savefig("fig_interactioncount_over_videos.pdf")

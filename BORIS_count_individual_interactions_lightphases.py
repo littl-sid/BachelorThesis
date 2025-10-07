@@ -1,5 +1,6 @@
 from scipy.stats import mannwhitneyu
 import matplotlib.pyplot as plt
+import numpy as np
 import seaborn as sns
 import pandas as pd
 import glob
@@ -197,6 +198,14 @@ def main():
         else:
             sig = "ns"
         plt.text(i, max_val + y_offset, sig, ha="center", va="bottom", fontsize=12)
+
+        # Bonferroni-Korrektur
+        m = 6
+        p_corr = np.minimum(p * m, 1)
+        a_corr = [0.05 / m, 0.01 / m, 0.001 / m]
+        print(
+            labels[i], "p-Wert:", p, "Korrektur:", p_corr, "Signifkanzniveau:", a_corr
+        )
 
     plt.ylabel("# Interaktionen")
     plt.xlabel("")

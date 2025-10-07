@@ -1,5 +1,6 @@
 from IPython import embed
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import re
 
@@ -208,3 +209,10 @@ def get_color(file):
         color_A = "seagreen"
         color_B = "skyblue"
     return color_A, color_B
+
+
+def get_bonferroni_corr(p_data):
+    p = np.array(p_data)
+    m = len(p)
+    p_corr = np.minimum(p * m, 1)
+    return p_corr

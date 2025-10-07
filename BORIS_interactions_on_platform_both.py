@@ -1,5 +1,6 @@
 from scipy.stats import mannwhitneyu
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import glob
 from functions import (
@@ -9,7 +10,7 @@ from functions import (
 )
 
 
-def get_interactions_on_platforms(dataset, ax):
+def get_interactions_on_platforms(dataset, ax, id):
     all_interactions_A = []
     all_interactions_B = []
 
@@ -67,6 +68,12 @@ def get_interactions_on_platforms(dataset, ax):
     ax.plot([1, 1, 2, 2], [y, y + h, y + h, y], lw=1.5, color="black")
     ax.text(1.5, y + h, sig, ha="center", va="bottom", fontsize=12)
 
+    # Bonferroni-Korrektur
+    m = 2
+    p_corr = np.minimum(p * m, 1)
+    a_corr = [0.05 / m, 0.01 / m, 0.001 / m]
+    print(id, "p-Wert:", p, "Korrektur:", p_corr, "Signifkanzniveau:", a_corr)
+
     handles = get_legend(dataset[0])
     # ax.legend(handles=handles, loc="upper right", fontsize=8)
 
@@ -95,8 +102,8 @@ def main():
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(6, 4.5), sharey=True)
 
-    get_interactions_on_platforms(dataset_1, ax1)
-    get_interactions_on_platforms(dataset_2, ax2)
+    get_interactions_on_platforms(dataset_1, ax1, 1)
+    get_interactions_on_platforms(dataset_2, ax2, 2)
 
     ax1.set_ylabel("# Interaktionen")
 
